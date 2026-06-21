@@ -413,6 +413,37 @@ const ToolsPage: React.FC = () => {
     return { annualDiv, monthlyDiv: annualDiv / 12, dripValue: balance };
   }, [divInvested, divYield, divYears]);
 
+  // Rule of 72
+  const [ruleRate, setRuleRate] = useState('7');
+  const ruleCalc = useMemo(() => {
+    const rate = parseNumericInput(ruleRate) || 0;
+    return { years: rate > 0 ? (72 / rate).toFixed(1) : '∞', months: rate > 0 ? Math.round(864 / rate) : Infinity };
+  }, [ruleRate]);
+
+  // CAGR
+  const [cagrInitial, setCagrInitial] = useState('10000');
+  const [cagrFinal, setCagrFinal] = useState('25000');
+  const [cagrYears, setCagrYears] = useState('8');
+  const cagrCalc = useMemo(() => {
+    const initial = parseNumericInput(cagrInitial) || 0;
+    const final = parseNumericInput(cagrFinal) || 0;
+    const years = parseNumericInput(cagrYears) || 0;
+    const cagr = initial > 0 && years > 0 ? (Math.pow(final / initial, 1 / years) - 1) * 100 : 0;
+    return { cagr, gain: final - initial };
+  }, [cagrInitial, cagrFinal, cagrYears]);
+
+  // Capital Gains Tax
+  const [cgBuy, setCgBuy] = useState('10000');
+  const [cgSell, setCgSell] = useState('25000');
+  const [cgIncome, setCgIncome] = useState('85000');
+  const cgCalc = useMemo(() => {
+    const gain = Math.max(0, (parseNumericInput(cgSell) || 0) - (parseNumericInput(cgBuy) || 0));
+    const income = parseNumericInput(cgIncome) || 0;
+    const ltRate = income > 518900 ? 0.20 : income > 47025 ? 0.15 : 0;
+    const stRate = income > 578125 ? 0.37 : income > 231250 ? 0.35 : income > 182050 ? 0.32 : income > 95375 ? 0.24 : income > 44725 ? 0.22 : income > 11000 ? 0.12 : 0.10;
+    return { gain, ltTax: gain * ltRate, stTax: gain * stRate, ltRate: ltRate * 100, stRate: stRate * 100, savings: gain * (stRate - ltRate) };
+  }, [cgBuy, cgSell, cgIncome]);
+
   // Dollar Cost Averaging
   const [dcaMonthly, setDcaMonthly] = useState('500');
   const [dcaYears, setDcaYears] = useState('10');
@@ -623,7 +654,7 @@ const ToolsPage: React.FC = () => {
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 items-start">
               <CollapsibleTool
                 title="Compound Interest"
                 icon={<TrendingUp className="w-5 h-5" />}
@@ -690,6 +721,21 @@ const ToolsPage: React.FC = () => {
                   <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Roth Advantage</p>
                     <p className="text-2xl font-bold text-orange-400">{formatCurrency(Math.abs(iraCalc.difference))}</p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool title="Rule of 72" icon={<Calculator className="w-5 h-5" />} description="How long to double your money">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Return %</label>
+                    <input type="number" value={ruleRate} onChange={e => setRuleRate(e.target.value)}
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-6 text-center border border-white/5">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Years to Double</p>
+                    <p className="text-3xl font-bold text-orange-400">{ruleCalc.years}</p>
+                    <p className="text-xs text-gray-500 mt-2">≈ {ruleCalc.months !== Infinity ? `${ruleCalc.months} months` : '—'}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1058,7 +1104,7 @@ const ToolsPage: React.FC = () => {
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 items-start">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
               <CollapsibleTool
                 title="Credit Card Payoff"
                 icon={<CreditCard className="w-5 h-5" />}
@@ -1135,6 +1181,43 @@ const ToolsPage: React.FC = () => {
                     <p className="text-2xl font-bold text-white">{formatCurrency(taxCalc.tax)}</p>
                     <p className="text-xs text-gray-500 mt-1">Effective Rate: {taxCalc.effectiveRate.toFixed(1)}%</p>
                   </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool title="Capital Gains Tax" icon={<Receipt className="w-5 h-5" />} description="Short-term vs long-term tax owed">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-2 font-medium">Buy Price</label>
+                      <input type="number" value={cgBuy} onChange={e => setCgBuy(e.target.value)}
+                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-2 font-medium">Sell Price</label>
+                      <input type="number" value={cgSell} onChange={e => setCgSell(e.target.value)}
+                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Income</label>
+                    <input type="number" value={cgIncome} onChange={e => setCgIncome(e.target.value)}
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Gain</p>
+                    <p className="text-lg font-bold text-white">{formatCurrency(cgCalc.gain)}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Short-term ({cgCalc.stRate.toFixed(0)}%)</p>
+                      <p className="text-base font-bold text-red-400">{formatCurrency(cgCalc.stTax)}</p>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Long-term ({cgCalc.ltRate.toFixed(0)}%)</p>
+                      <p className="text-base font-bold text-green-400">{formatCurrency(cgCalc.ltTax)}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-center text-orange-400 font-mono">Save {formatCurrency(cgCalc.savings)} by holding &gt;1 year</p>
                 </div>
               </CollapsibleTool>
 
@@ -1353,6 +1436,36 @@ const ToolsPage: React.FC = () => {
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Portfolio Value</p>
                     <p className="text-2xl font-bold text-green-400">{formatCurrency(dcaCalc.futureValue)}</p>
                     <p className="text-xs text-gray-500 mt-1">Gain: {formatCurrency(dcaCalc.gain)} on {formatCurrency(dcaCalc.totalContrib)} invested</p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool title="CAGR Calculator" icon={<TrendingUp className="w-5 h-5" />} description="Compound annual growth rate">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">Initial Value</label>
+                    <input type="number" value={cagrInitial} onChange={e => setCagrInitial(e.target.value)}
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">Final Value</label>
+                    <input type="number" value={cagrFinal} onChange={e => setCagrFinal(e.target.value)}
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                    <input type="number" value={cagrYears} onChange={e => setCagrYears(e.target.value)}
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">CAGR</p>
+                      <p className="text-lg font-bold text-green-400">{cagrCalc.cagr.toFixed(2)}%</p>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Gain</p>
+                      <p className="text-lg font-bold text-orange-400">{formatCurrency(cagrCalc.gain)}</p>
+                    </div>
                   </div>
                 </div>
               </CollapsibleTool>
