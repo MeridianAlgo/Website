@@ -502,13 +502,13 @@ const ToolsPage: React.FC = () => {
 
         <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl mb-8 border border-white/5">
-            <Calculator className="w-10 h-10 text-orange-300" />
+            <Calculator className="w-10 h-10 text-orange-400" />
           </div>
 
           <h1 className="text-4xl md:text-7xl font-display font-bold mb-6 leading-tight uppercase tracking-tight text-white">
-            Financial <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-yellow-400">Tools</span>
+            Financial <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">Tools</span>
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-orange-300 to-yellow-400 mx-auto mb-8"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 mx-auto mb-8"></div>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light mb-10">
             Interactive calculators to plan, experiment, and optimize your financial future.
           </p>
@@ -527,7 +527,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Budget & Cash Flow */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <DollarSign className="w-8 h-8 text-orange-300" />
+              <DollarSign className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Budget & Cash Flow</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -542,23 +542,23 @@ const ToolsPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Income</label>
                     <input type="number" value={income} onChange={e => setIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300 focus:outline-none transition-all" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all" />
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Needs %</label>
                       <input type="number" value={needs} onChange={e => setNeeds(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-300" />
+                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Wants %</label>
                       <input type="number" value={wants} onChange={e => setWants(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-300" />
+                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Savings %</label>
                       <input type="number" value={savings} onChange={e => setSavings(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-300" />
+                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
                     </div>
                   </div>
                   <p className={`text-xs text-center font-mono ${budgetCalc.balanced ? 'text-green-400' : 'text-red-400'}`}>
@@ -590,23 +590,23 @@ const ToolsPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Expenses</label>
                     <input type="number" value={monthlyExpenses} onChange={e => setMonthlyExpenses(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Months of Coverage</label>
                     <input type="number" value={coverageMonths} onChange={e => setCoverageMonths(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Current Savings</label>
                     <input type="number" value={emergencySavings} onChange={e => setEmergencySavings(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
                   </div>
                   <div className="bg-white/5 rounded-xl p-6 mt-4 border border-white/5">
                     <p className="text-sm text-gray-400 uppercase tracking-wider mb-2">Target Fund</p>
                     <p className="text-3xl font-bold text-white mb-2">{formatCurrency(emergencyCalc.target)}</p>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-orange-300">Gap: {formatCurrency(emergencyCalc.gap)}</span>
+                      <span className="text-orange-400">Gap: {formatCurrency(emergencyCalc.gap)}</span>
                       <span className="text-gray-400">{emergencyCalc.monthsCovered.toFixed(1)} months ready</span>
                     </div>
                   </div>
@@ -618,7 +618,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Saving & Investing */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-300" />
+              <TrendingUp className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Saving & Investing</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -689,7 +689,7 @@ const ToolsPage: React.FC = () => {
                   </div>
                   <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Roth Advantage</p>
-                    <p className="text-2xl font-bold text-orange-300">{formatCurrency(Math.abs(iraCalc.difference))}</p>
+                    <p className="text-2xl font-bold text-orange-400">{formatCurrency(Math.abs(iraCalc.difference))}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -742,7 +742,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Debt & Loans */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <CreditCard className="w-8 h-8 text-orange-300" />
+              <CreditCard className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Debt & Loans</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -861,7 +861,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Paycheck & HSA */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Receipt className="w-8 h-8 text-orange-300" />
+              <Receipt className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Income & Benefits</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -876,7 +876,7 @@ const ToolsPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Gross Pay (Monthly)</label>
                     <input type="number" value={paycheckGross} onChange={e => setPaycheckGross(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -911,7 +911,7 @@ const ToolsPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Contribution</label>
                     <input type="number" value={hsaContribution} onChange={e => setHsaContribution(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -946,7 +946,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Advanced Planning */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-300" />
+              <TrendingUp className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Advanced Planning</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -1053,7 +1053,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: More Calculators */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Calculator className="w-8 h-8 text-orange-300" />
+              <Calculator className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">More Calculators</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -1185,7 +1185,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Everyday Tools */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Calculator className="w-8 h-8 text-orange-300" />
+              <Calculator className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Everyday Tools</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -1196,12 +1196,12 @@ const ToolsPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Total Assets</label>
                     <input type="number" value={totalAssets} onChange={e => setTotalAssets(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300 focus:outline-none" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">Total Liabilities</label>
                     <input type="number" value={totalLiabilities} onChange={e => setTotalLiabilities(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-300 focus:outline-none" />
+                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none" />
                   </div>
                   <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
                     <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Net Worth</p>
@@ -1273,7 +1273,7 @@ const ToolsPage: React.FC = () => {
                     </div>
                     <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Tip Total</p>
-                      <p className="text-lg font-bold text-orange-300">{formatCurrency(tipCalc.tip)}</p>
+                      <p className="text-lg font-bold text-orange-400">{formatCurrency(tipCalc.tip)}</p>
                     </div>
                   </div>
                 </div>
@@ -1285,7 +1285,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Investment Analysis */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-300" />
+              <TrendingUp className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Investment Analysis</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -1379,7 +1379,7 @@ const ToolsPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Future Need</p>
-                      <p className="text-lg font-bold text-orange-300">{formatCurrency(inflationCalc.futureNeeded)}</p>
+                      <p className="text-lg font-bold text-orange-400">{formatCurrency(inflationCalc.futureNeeded)}</p>
                     </div>
                     <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Today's Power</p>
@@ -1395,7 +1395,7 @@ const ToolsPage: React.FC = () => {
           {/* Section: Business & Salary */}
           <section>
             <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Briefcase className="w-8 h-8 text-orange-300" />
+              <Briefcase className="w-8 h-8 text-orange-400" />
               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Business & Salary</h2>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
@@ -1465,7 +1465,7 @@ const ToolsPage: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs text-orange-300/80 uppercase tracking-wider mb-2 font-mono">Option A</p>
+                      <p className="text-xs text-orange-400/80 uppercase tracking-wider mb-2 font-mono">Option A</p>
                       <input type="number" value={loanRate1} onChange={e => setLoanRate1(e.target.value)} placeholder="Rate %" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white mb-2" />
                       <input type="number" value={loanTerm1} onChange={e => setLoanTerm1(e.target.value)} placeholder="Months" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
                     </div>
@@ -1477,7 +1477,7 @@ const ToolsPage: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-orange-300/80 uppercase tracking-wider mb-1">A Monthly</p>
+                      <p className="text-xs text-orange-400/80 uppercase tracking-wider mb-1">A Monthly</p>
                       <p className="text-base font-bold text-white">{formatCurrency(loanCompCalc.a.pmt)}</p>
                       <p className="text-[10px] text-gray-500 mt-1">Interest: {formatCurrency(loanCompCalc.a.interest)}</p>
                     </div>

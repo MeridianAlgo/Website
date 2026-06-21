@@ -1,14 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
-interface NavLink {
-  name: string;
-  to: string;
-  external?: boolean;
-}
-
-const LEARN_LINKS: NavLink[] = [
+const NAV_LINKS = [
   { name: 'Financial Tools', to: '/tools' },
   { name: 'Open Source', to: '/opensource' },
   { name: 'Newsletters', to: '/newsletters' },
@@ -21,8 +15,6 @@ const Navbar: React.FC = () => {
   const showHome = location.pathname !== '/';
   const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [learnOpen, setLearnOpen] = useState(false);
-  const learnCloseTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +46,7 @@ const Navbar: React.FC = () => {
         />
         {/* Orange divider — stays fixed, fades out after word slides away */}
         <span
-          className="h-6 sm:h-8 w-0.5 bg-orange-300 mx-2 sm:mx-4 flex-shrink-0"
+          className="h-6 sm:h-8 w-0.5 bg-orange-400 mx-2 sm:mx-4 flex-shrink-0"
           style={{
             opacity: nameHidden ? 0 : 1,
             transition: 'opacity 220ms ease',
@@ -83,76 +75,42 @@ const Navbar: React.FC = () => {
           <>
             <Link
               to="/"
-              className={`inline-flex items-center h-8 leading-none text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-300 transition-colors duration-200 uppercase font-mono px-1 ${location.pathname === '/' ? 'text-orange-300' : ''}`}
+              className={`inline-flex items-center h-8 leading-none text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-400 transition-colors duration-200 uppercase font-mono px-1 ${location.pathname === '/' ? 'text-orange-400' : ''}`}
             >
               Home
             </Link>
-            <span className="mx-0.5 xl:mx-1 text-white/20 select-none" aria-hidden="true">|</span>
+            <span className="mx-0.5 xl:mx-1 text-orange-400/50 select-none" aria-hidden="true">|</span>
           </>
         )}
 
         <Link
           to="/about"
-          className={`inline-flex items-center h-8 leading-none text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-300 transition-colors duration-200 uppercase font-mono px-1 ${location.pathname === '/about' ? 'text-orange-300' : ''}`}
+          className={`inline-flex items-center h-8 leading-none text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-400 transition-colors duration-200 uppercase font-mono px-1 ${location.pathname === '/about' ? 'text-orange-400' : ''}`}
         >
           About
         </Link>
-        <span className="mx-0.5 xl:mx-1 text-white/20 select-none" aria-hidden="true">|</span>
+        <span className="mx-0.5 xl:mx-1 text-orange-400/50 select-none" aria-hidden="true">|</span>
 
-        {/* Learn dropdown */}
-        <div
-          className="relative"
-          onMouseEnter={() => {
-            if (learnCloseTimer.current) window.clearTimeout(learnCloseTimer.current);
-            setLearnOpen(true);
-          }}
-          onMouseLeave={() => {
-            if (learnCloseTimer.current) window.clearTimeout(learnCloseTimer.current);
-            learnCloseTimer.current = window.setTimeout(() => setLearnOpen(false), 150);
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setLearnOpen((v) => !v)}
-            className={`inline-flex items-center h-8 leading-none cursor-pointer text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-300 transition-colors duration-200 uppercase font-mono px-1 whitespace-nowrap ${
-              (location.pathname === '/tools' || location.pathname === '/opensource' || location.pathname === '/newsletters') ? 'text-orange-300' : ''
-            }`}
-            aria-haspopup="true"
-            aria-expanded={learnOpen}
-          >
-            Learning
-          </button>
-          <div
-            className={`${learnOpen ? 'visible opacity-100 pointer-events-auto translate-y-0' : 'invisible opacity-0 pointer-events-none -translate-y-1'} transition-all duration-150 absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 z-50`}
-            onMouseEnter={() => {
-              if (learnCloseTimer.current) window.clearTimeout(learnCloseTimer.current);
-              setLearnOpen(true);
-            }}
-            onMouseLeave={() => {
-              if (learnCloseTimer.current) window.clearTimeout(learnCloseTimer.current);
-              learnCloseTimer.current = window.setTimeout(() => setLearnOpen(false), 150);
-            }}
-          >
-            <div className="bg-black border border-white/10 rounded-xl shadow-2xl py-2">
-              {LEARN_LINKS.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.to}
-                  className="block px-4 py-3 text-[11px] text-white hover:text-orange-300 hover:bg-white/5 transition-colors duration-150 text-center font-mono uppercase tracking-wider"
-                  onClick={() => setLearnOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+        {NAV_LINKS.map((link, i) => (
+          <>
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`inline-flex items-center h-8 leading-none text-white text-xs xl:text-sm font-medium tracking-wide hover:text-orange-400 transition-colors duration-200 uppercase font-mono px-1 whitespace-nowrap ${location.pathname === link.to ? 'text-orange-400' : ''}`}
+            >
+              {link.name}
+            </Link>
+            {i < NAV_LINKS.length - 1 && (
+              <span className="mx-0.5 xl:mx-1 text-orange-400/50 select-none" aria-hidden="true">|</span>
+            )}
+          </>
+        ))}
 
       </div>
 
       {/* Mobile hamburger */}
       <button
-        className="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-white hover:text-orange-300 hover:bg-white/5 transition-colors duration-200 flex-shrink-0"
+        className="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-white hover:text-orange-400 hover:bg-white/5 transition-colors duration-200 flex-shrink-0"
         aria-label="Toggle menu"
         onClick={() => setMobileOpen((v) => !v)}
       >
@@ -164,21 +122,18 @@ const Navbar: React.FC = () => {
         mobileOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
       }`}>
         <div className="px-4 py-4 space-y-1">
-          <Link onClick={closeMobile} to="/" className={`block px-3 py-2 text-sm text-white hover:text-orange-300 transition-colors duration-150 ${location.pathname === '/' ? 'text-orange-300' : ''}`}>Home</Link>
-          <Link onClick={closeMobile} to="/about" className={`block px-3 py-2 text-sm text-white hover:text-orange-300 transition-colors duration-150 ${location.pathname === '/about' ? 'text-orange-300' : ''}`}>About</Link>
-          <div className="pt-2">
-            <div className="px-3 text-gray-600 text-[10px] uppercase tracking-widest mb-1 font-mono">Learn</div>
-            {LEARN_LINKS.map((link) => (
-              <Link
-                key={link.name}
-                onClick={closeMobile}
-                to={link.to}
-                className={`block px-5 py-2 text-sm text-gray-400 hover:text-white transition-colors duration-150 ${location.pathname === link.to ? 'text-orange-300' : ''}`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
+          <Link onClick={closeMobile} to="/" className={`block px-3 py-2 text-sm text-white hover:text-orange-400 transition-colors duration-150 ${location.pathname === '/' ? 'text-orange-400' : ''}`}>Home</Link>
+          <Link onClick={closeMobile} to="/about" className={`block px-3 py-2 text-sm text-white hover:text-orange-400 transition-colors duration-150 ${location.pathname === '/about' ? 'text-orange-400' : ''}`}>About</Link>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              onClick={closeMobile}
+              to={link.to}
+              className={`block px-3 py-2 text-sm text-white hover:text-orange-400 transition-colors duration-150 ${location.pathname === link.to ? 'text-orange-400' : ''}`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>
