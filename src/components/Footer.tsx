@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-black pt-20 pb-10 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-black/80 backdrop-blur-sm pt-20 pb-10 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-orange-400/55" />
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
           {/* Logo and Bio Section */}

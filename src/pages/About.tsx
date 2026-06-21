@@ -111,7 +111,7 @@ const About = () => {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="group bg-gray-900/20 p-8 rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                  className="group bg-gray-900/60 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden z-10"
                 >
                   <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6">
