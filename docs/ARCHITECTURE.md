@@ -2,7 +2,7 @@
 
 ## Overview
 
-meridianalgo.org is a static React SPA built with Vite and deployed as a CDN-hosted site. There is no backend — all dynamic behavior uses client-side state, the Formspree API for contact form submissions, and a static `newsletters/manifest.json` file for the newsletter archive.
+meridianalgo.org is a static React SPA built with Vite and deployed as a CDN-hosted site. There is no backend — all dynamic behavior uses client-side state, the Formspree API for contact form submissions, and the [MeridianAlgo/newsletters](https://github.com/MeridianAlgo/newsletters) repo as the content store for the newsletter archive.
 
 ## Routing
 
@@ -49,7 +49,24 @@ Each calculator in `ToolsPage.tsx` is self-contained: local `useState` for input
 
 ## Newsletter Archive
 
-`Newsletters.tsx` fetches `/newsletters/manifest.json` at runtime. The manifest lists newsletter PDFs stored in `public/newsletters/`. A built-in PDF viewer (`<iframe>`) opens selected issues inline.
+Issues are **not** in this repo. They live in
+[MeridianAlgo/newsletters](https://github.com/MeridianAlgo/newsletters), which
+holds the PDFs and a `manifest.json` describing each one. Publishing an issue is
+a push to that repo — this site does not need to be rebuilt or redeployed.
+
+`Newsletters.tsx` fetches the manifest at runtime and builds two URLs per issue
+from the `readBase` / `downloadBase` fields it carries:
+
+| Purpose | Host | Why |
+|---------|------|-----|
+| Manifest | `raw.githubusercontent.com` | 5-minute cache, so new issues appear quickly |
+| Read (`<iframe>`) | `cdn.jsdelivr.net` | Serves `application/pdf`, so the browser renders it inline |
+| Download | `raw.githubusercontent.com` | Serves `application/octet-stream`, so the link downloads |
+
+Both hosts send `Access-Control-Allow-Origin: *`. If the fetch fails the page
+says so and links to the repo rather than showing an empty archive.
+
+Adding a series or changing categories is a manifest edit — no code change here.
 
 ## Styling
 
@@ -73,6 +90,8 @@ worksheet used on the home page. It runs the same math as the Compound Interest 
 ## Static Assets
 
 - `public/meridianalgo.png` — favicon and navbar logo
-- `public/newsletters/` — PDF files + `manifest.json`
+- `public/Social.png` — Open Graph / Twitter card image
 - `public/legal/` — Privacy Policy and Terms of Service PDFs
 - `src/assets/images/` — partner logos (imported as ES modules)
+
+Newsletter PDFs are not static assets of this site; see Newsletter Archive above.

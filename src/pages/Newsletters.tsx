@@ -1,16 +1,32 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface Newsletter {
+// Issues live in github.com/MeridianAlgo/newsletters — publishing is a push
+// there, not a redeploy here. raw serves the manifest fresh (5 min cache);
+// jsDelivr serves PDFs as application/pdf so they render in the reader, while
+// raw serves them as octet-stream so the download link actually downloads.
+const MANIFEST_URL =
+  'https://raw.githubusercontent.com/MeridianAlgo/newsletters/main/manifest.json';
+const READ_BASE = 'https://cdn.jsdelivr.net/gh/MeridianAlgo/newsletters@main/';
+const DOWNLOAD_BASE = 'https://raw.githubusercontent.com/MeridianAlgo/newsletters/main/';
+
+interface ManifestEntry {
   id: string;
   title: string;
   description: string;
-  fileName: string;
-  fileUrl: string;
-  uploadDate: string;
-  category?: string;
+  series: string;
+  seriesName?: string;
   week?: number;
+  category?: string;
+  publishedDate: string;
+  file: string;
   thumbnail?: string;
+}
+
+interface Newsletter extends ManifestEntry {
+  fileName: string;
+  readUrl: string;
+  downloadUrl: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -19,6 +35,7 @@ const Newsletters = () => {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
   const [selectedPdf, setSelectedPdf] = useState<Newsletter | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [startDate, setStartDate] = useState('');
@@ -32,25 +49,24 @@ const Newsletters = () => {
   useEffect(() => {
     const loadNewsletters = async () => {
       try {
-        const response = await fetch('/newsletters/manifest.json');
-        if (response.ok) {
-          const manifestData = await response.json();
-          const newsletterList: Newsletter[] = manifestData.newsletters.map(
-            (item: { fileName: string;[key: string]: unknown }) => ({
-              ...item,
-              fileUrl: `/newsletters/${item.fileName}`,
-              id: item.fileName.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9]/g, '-')
-            })
-          );
-          newsletterList.sort(
-            (a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-          );
-          setNewsletters(newsletterList);
-        } else {
-          setNewsletters([]);
-        }
+        const response = await fetch(MANIFEST_URL);
+        if (!response.ok) throw new Error(`manifest ${response.status}`);
+        const manifest = await response.json();
+        const readBase = manifest.readBase ?? READ_BASE;
+        const downloadBase = manifest.downloadBase ?? DOWNLOAD_BASE;
+
+        const newsletterList: Newsletter[] = manifest.newsletters.map(
+          (item: ManifestEntry) => ({
+            ...item,
+            fileName: item.file.split('/').pop() as string,
+            readUrl: readBase + item.file,
+            downloadUrl: downloadBase + item.file
+          })
+        );
+        newsletterList.sort((a, b) => b.publishedDate.localeCompare(a.publishedDate));
+        setNewsletters(newsletterList);
       } catch {
-        setNewsletters([]);
+        setLoadError(true);
       } finally {
         setLoading(false);
       }
@@ -69,8 +85,12 @@ const Newsletters = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedPdf]);
 
+  // Parse as local midnight. Bare "2024-03-20" is parsed as UTC, which renders
+  // as the 19th anywhere west of Greenwich.
+  const parseDate = (dateString: string) => new Date(dateString + 'T00:00:00');
+
   const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString('en-US', {
+    parseDate(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: '2-digit'
@@ -105,7 +125,7 @@ const Newsletters = () => {
       selectedCategories.length === 0 ||
       (newsletter.category && selectedCategories.includes(newsletter.category));
 
-    const ts = new Date(newsletter.uploadDate).getTime();
+    const ts = parseDate(newsletter.publishedDate).getTime();
     const afterStart = startDate ? ts >= new Date(startDate + 'T00:00:00').getTime() : true;
     const beforeEnd = endDate ? ts <= new Date(endDate + 'T23:59:59').getTime() : true;
 
@@ -226,6 +246,23 @@ const Newsletters = () => {
 
         {loading ? (
           <p className="lbl py-12">Loading the archive…</p>
+        ) : loadError ? (
+          <div className="py-12">
+            <p className="text-[1.0625rem]">The archive didn’t load.</p>
+            <p className="mt-1 max-w-column text-[0.9375rem] leading-relaxed text-steel">
+              Issues are served from GitHub. Every one of them is still readable
+              at{' '}
+              <a
+                href="https://github.com/MeridianAlgo/newsletters"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-stamp"
+              >
+                github.com/MeridianAlgo/newsletters
+              </a>
+              .
+            </p>
+          </div>
         ) : filteredNewsletters.length === 0 ? (
           <div className="py-12">
             <p className="text-[1.0625rem]">No issues match those filters.</p>
@@ -253,7 +290,8 @@ const Newsletters = () => {
                       {issue.description}
                     </p>
                     <p className="lbl mt-2">
-                      {formatDate(issue.uploadDate)}
+                      {formatDate(issue.publishedDate)}
+                      {issue.seriesName ? ` · ${issue.seriesName}` : ''}
                       {issue.category ? ` · ${issue.category}` : ''}
                     </p>
                   </div>
@@ -269,7 +307,7 @@ const Newsletters = () => {
                       </button>
                     ) : (
                       <a
-                        href={issue.fileUrl}
+                        href={issue.readUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn-secondary"
@@ -277,7 +315,7 @@ const Newsletters = () => {
                         Open
                       </a>
                     )}
-                    <a href={issue.fileUrl} download={issue.fileName} className="btn-secondary">
+                    <a href={issue.downloadUrl} download={issue.fileName} className="btn-secondary">
                       Download
                     </a>
                   </div>
@@ -327,7 +365,7 @@ const Newsletters = () => {
               <h2 className="lbl text-ink">{selectedPdf.title}</h2>
               <div className="flex items-center gap-2">
                 <a
-                  href={selectedPdf.fileUrl}
+                  href={selectedPdf.downloadUrl}
                   download={selectedPdf.fileName}
                   className="lbl hover:text-stamp"
                 >
@@ -343,7 +381,7 @@ const Newsletters = () => {
                 </button>
               </div>
             </div>
-            <iframe src={selectedPdf.fileUrl} className="flex-1 border-0" title={selectedPdf.title} />
+            <iframe src={selectedPdf.readUrl} className="flex-1 border-0" title={selectedPdf.title} />
           </div>
         </div>
       )}

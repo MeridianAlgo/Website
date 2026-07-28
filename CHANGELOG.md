@@ -4,6 +4,34 @@ All notable changes to meridianalgo.org are documented here.
 
 ---
 
+## [v5.1.0] - 2026-07-28
+
+Newsletters moved out of this repo.
+
+### Changed
+- Issues now live in [MeridianAlgo/newsletters](https://github.com/MeridianAlgo/newsletters),
+  which holds the PDFs plus a `manifest.json` describing each one. `/newsletters`
+  fetches that manifest at page load, so publishing an issue is a push to that
+  repo — no site rebuild, no redeploy
+- PDFs render from jsDelivr (correct `application/pdf` content type) and download
+  from raw.githubusercontent (forced attachment)
+- Issue rows now show the series name alongside the date and category
+- Filenames normalized to `<series>-week-NN.pdf`, dropping the `(1)` / `(2)`
+  duplicate-download suffixes
+
+### Fixed
+- Week 9 was unopenable — the manifest pointed at `Smart Cents Weekly Newsletter
+  Week 9.pdf` but the file on disk was `Smart Cents Weekly - Newsletter Week 9.pdf`.
+  The new repo has a `validate.mjs` that fails CI on this class of mismatch
+- A failed archive load now says so and links to the repo, instead of rendering
+  as an empty archive
+
+### Removed
+- `public/newsletters/` — 19 PDFs and their thumbnails, ~all of the repo's weight
+- `public/mountain.jpg` — unreferenced, 572 KB
+
+---
+
 ## [v5.0.0] - 2026-07-27
 
 Ground-up redesign. The dark/orange/glass-card treatment is gone; the site is now
