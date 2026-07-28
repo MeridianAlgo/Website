@@ -1,116 +1,215 @@
-@import './assets/styles/animations.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html {
-  width: 100%;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  font-family: "Google Sans Flex", sans-serif;
-  font-optical-sizing: auto;
-  font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  margin: 0;
-  font-family: "Google Sans Flex", sans-serif;
-  font-optical-sizing: auto;
-  font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
-  overflow-x: hidden;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-}
-
-img, video, svg, canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Focus styles */
-*:focus-visible {
-  outline: 2px solid rgba(253, 186, 116, 0.6);
-  outline-offset: 2px;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #111;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #404040;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #525252;
-}
-
-/* Hide scrollbar utility */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Fade-in Up Animation */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
+
+  body {
+    margin: 0;
+    background-color: theme('colors.paper');
+    color: theme('colors.ink');
+    font-family: theme('fontFamily.body');
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-optical-sizing: auto;
+  }
+
+  /* Headings carry the grotesque; body stays in the serif for reading. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: theme('fontFamily.display');
+    font-variation-settings: 'wdth' 108;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  img,
+  svg,
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  *:focus-visible {
+    outline: 2px solid theme('colors.stamp');
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: theme('colors.band');
+    color: theme('colors.ink');
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme('colors.paper');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.rule');
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.steel');
   }
 }
 
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(40px);
-  animation: fadeInUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
+@layer components {
 
-.fade-in-up-delayed {
-  opacity: 0;
-  transform: translateY(40px);
-  animation: fadeInUp 1s 0.3s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.animate-spin-slow {
-  animation: spin 2.5s linear infinite;
-}
-
-/* Fade In Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+  /* --- Sheet: the page-width column, ruled at both margins --------------- */
+  .sheet {
+    @apply mx-auto w-full max-w-sheet px-5 sm:px-8;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* --- Type roles -------------------------------------------------------- */
+  .lbl {
+    @apply font-mono text-[0.6875rem] uppercase tracking-[0.09em] text-steel;
+  }
+
+  .fig {
+    font-family: theme('fontFamily.mono');
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+    letter-spacing: -0.01em;
+  }
+
+  .display-1 {
+    @apply font-display text-[2.5rem] font-bold leading-[1.05] sm:text-[3.5rem] lg:text-[4.25rem];
+  }
+
+  .display-2 {
+    @apply font-display text-[1.75rem] font-bold leading-[1.1] sm:text-[2.25rem];
+  }
+
+  .lede {
+    @apply max-w-column text-[1.0625rem] leading-[1.7] text-steel sm:text-[1.1875rem];
+  }
+
+  /* --- Ledger row: label, leader dots, right-aligned figure -------------- */
+  .entry {
+    @apply flex items-baseline gap-0 py-2;
+  }
+
+  .entry-fill {
+    @apply mx-3 flex-1 self-center border-b border-dotted border-steel/50;
+  }
+
+  .entry-fig {
+    @apply fig w-28 shrink-0 text-right tabular-nums;
+  }
+
+  /* Accounting convention: a cost is red and parenthesised. */
+  .fig-neg {
+    @apply text-stamp;
+  }
+
+  .rule-total {
+    border-bottom: 3px double theme('colors.ink');
+  }
+
+  /* --- Controls ---------------------------------------------------------- */
+  /* Inputs read as blanks on a printed form: no box, just a ruled baseline. */
+  .field {
+    @apply fig w-full border-0 border-b border-steel/40 bg-transparent px-0 py-2 text-[0.9375rem] text-ink;
+    @apply transition-colors duration-150 placeholder:text-steel/50;
+    caret-color: theme('colors.stamp');
+    border-radius: 0;
+  }
+
+  .field:hover {
+    @apply border-steel/70;
+  }
+
+  .field:focus {
+    @apply border-stamp outline-none;
+    box-shadow: 0 1px 0 0 theme('colors.stamp');
+  }
+
+  .field-boxed {
+    @apply field border border-rule bg-paper px-3;
+  }
+
+  .field-boxed:focus {
+    @apply border-stamp;
+    box-shadow: none;
+  }
+
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[2px] px-5 py-3;
+    @apply font-mono text-[0.75rem] uppercase tracking-[0.09em];
+    @apply transition-colors duration-150;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-paper;
+  }
+
+  .btn-primary:hover {
+    @apply bg-stamp;
+  }
+
+  .btn-secondary {
+    @apply btn border border-steel/40 bg-transparent text-ink;
+  }
+
+  .btn-secondary:hover {
+    @apply border-ink bg-band;
+  }
+
+  /* Navigation reads as words, not as machine labels: no mono, no caps. */
+  .nav-link {
+    @apply font-sans text-[0.9375rem] font-medium text-steel transition-colors duration-150;
+  }
+
+  .nav-link:hover {
+    @apply text-ink;
+  }
+
+  /* --- Links ------------------------------------------------------------- */
+  .link {
+    @apply underline decoration-rule decoration-1 underline-offset-4 transition-colors duration-150;
+  }
+
+  .link:hover {
+    @apply text-stamp decoration-stamp;
+  }
+
+  /* --- Section heading: a filing label struck through the page rule ------ */
+  .section-head {
+    @apply flex items-baseline gap-4 border-t border-ink pt-4;
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
+@layer utilities {
+  .band-stripe:nth-child(even) {
+    background-color: theme('colors.band');
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

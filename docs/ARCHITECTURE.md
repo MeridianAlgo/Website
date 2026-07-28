@@ -53,12 +53,26 @@ Each calculator in `ToolsPage.tsx` is self-contained: local `useState` for input
 
 ## Styling
 
-Tailwind CSS handles all styling. The brand accent color is `orange-300` (#fdba74). Global CSS lives in `src/index.css` (Tailwind directives + focus/scrollbar styles). Keyframe animations are in `src/assets/styles/animations.css`.
+Tailwind CSS handles all styling, on a ledger-paper palette defined in `tailwind.config.js`:
+`paper` #eff1e9 (page), `sheet` #f8f9f4 (raised), `band` #dfe7d8 (the green bar on
+columnar accounting pads), `rule` #c3c9ba (hairlines), `steel` #35494e (secondary text),
+`ink` #171b14 (text), `stamp` #b5321f (margin rules, negatives, active state).
+
+Type: Archivo for headings and labels, Newsreader for body copy, IBM Plex Mono for
+figures and labels. Figures always use `.fig` so columns stay tabular.
+
+Global CSS lives in `src/index.css`, which defines the component vocabulary the pages
+compose from: `.sheet` (page column), `.lbl`, `.fig`, `.entry` + `.entry-fill` +
+`.entry-fig` (a ledger row with leader dots), `.field` / `.field-boxed`, `.btn-primary` /
+`.btn-secondary`, `.display-1` / `.display-2` / `.lede`. Prefer these over ad-hoc utility
+strings so the sheet stays consistent.
+
+`src/components/Ledger.tsx` is the signature element: an interactive compound-interest
+worksheet used on the home page. It runs the same math as the Compound Interest tool.
 
 ## Static Assets
 
 - `public/meridianalgo.png` — favicon and navbar logo
-- `public/mountain.jpg` — hero background on Home
 - `public/newsletters/` — PDF files + `manifest.json`
 - `public/legal/` — Privacy Policy and Terms of Service PDFs
 - `src/assets/images/` — partner logos (imported as ES modules)

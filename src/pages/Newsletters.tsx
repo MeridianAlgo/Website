@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Download, Calendar, Eye, X, FolderOpen, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Newsletter {
   id: string;
@@ -13,7 +13,7 @@ interface Newsletter {
   thumbnail?: string;
 }
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 10;
 
 const Newsletters = () => {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
@@ -21,12 +21,12 @@ const Newsletters = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    document.title = 'MeridianAlgo - Newsletters';
+    document.title = 'MeridianAlgo | Newsletters';
   }, []);
 
   useEffect(() => {
@@ -35,12 +35,16 @@ const Newsletters = () => {
         const response = await fetch('/newsletters/manifest.json');
         if (response.ok) {
           const manifestData = await response.json();
-          const newsletterList: Newsletter[] = manifestData.newsletters.map((item: { fileName: string; [key: string]: unknown }) => ({
-            ...item,
-            fileUrl: `/newsletters/${item.fileName}`,
-            id: item.fileName.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9]/g, '-')
-          }));
-          newsletterList.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
+          const newsletterList: Newsletter[] = manifestData.newsletters.map(
+            (item: { fileName: string;[key: string]: unknown }) => ({
+              ...item,
+              fileUrl: `/newsletters/${item.fileName}`,
+              id: item.fileName.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9]/g, '-')
+            })
+          );
+          newsletterList.sort(
+            (a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
+          );
           setNewsletters(newsletterList);
         } else {
           setNewsletters([]);
@@ -55,19 +59,26 @@ const Newsletters = () => {
     loadNewsletters();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  // Escape closes the reader.
+  useEffect(() => {
+    if (!selectedPdf) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedPdf(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedPdf]);
+
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: 'short',
+      day: '2-digit'
     });
-  };
 
   const toggleCategory = (category: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
     setCurrentPage(1);
   };
@@ -80,14 +91,18 @@ const Newsletters = () => {
     setCurrentPage(1);
   };
 
-  const categories = Array.from(new Set(newsletters.map(n => n.category).filter(Boolean))) as string[];
+  const categories = Array.from(
+    new Set(newsletters.map((n) => n.category).filter(Boolean))
+  ) as string[];
 
   const filteredNewsletters = newsletters.filter((newsletter) => {
-    const matchesSearch = searchQuery === '' ||
+    const matchesSearch =
+      searchQuery === '' ||
       newsletter.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       newsletter.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory = selectedCategories.length === 0 ||
+    const matchesCategory =
+      selectedCategories.length === 0 ||
       (newsletter.category && selectedCategories.includes(newsletter.category));
 
     const ts = new Date(newsletter.uploadDate).getTime();
@@ -99,300 +114,240 @@ const Newsletters = () => {
 
   const totalPages = Math.ceil(filteredNewsletters.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedNewsletters = filteredNewsletters.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginated = filteredNewsletters.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const filtersActive = Boolean(searchQuery || selectedCategories.length || startDate || endDate);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white selection:bg-orange-400/20">
+    <>
+      <section className="sheet py-14 lg:py-20">
+        <p className="lbl"></p>
+        <h1 className="display-1 mt-3 max-w-[20ch]">Every issue, free to read.</h1>
+        <p className="lede mt-6">
+          Smart Cents Weekly covers one idea and one habit a week. Corporate
+          Compass goes deeper on how companies make money. Both are PDFs, so read
+          them here or keep a copy.
+        </p>
 
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:50px_50px]" />
-
-        <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
-          <div className="animate-fade-in-up">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-orange-400/80 font-mono mb-8 inline-block bg-white/5 px-4 py-2 rounded-full border border-white/10">
-              Weekly Publication
-            </span>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
-            <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 leading-none uppercase tracking-tight text-white mt-6">
-              News<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">letters</span>
-            </h1>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10">
-              Stay informed with our latest insights, market analysis, and financial literacy strategies.
-            </p>
-          </div>
-          <div className="animate-fade-in-up flex justify-center gap-12" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
-            {[
-              { value: newsletters.length > 0 ? newsletters.length.toString() : '—', label: 'Issues' },
-              { value: 'Weekly', label: 'Frequency' },
-              { value: 'Free', label: 'Access' },
-            ].map(({ value, label }) => (
-              <div key={label} className="text-center">
-                <p className="text-3xl font-bold text-white">{value}</p>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mt-1 font-mono">{label}</p>
-              </div>
-            ))}
-          </div>
+        <div className="mt-8 max-w-column border-l-4 border-stamp bg-band py-4 pl-5 pr-4">
+          <p className="font-sans text-[1.0625rem] font-bold">The presses are back on.</p>
+          <p className="mt-1 text-[0.9375rem] leading-relaxed text-steel">
+            We went quiet for a while. The newsletter factory is running again, so
+            expect new issues on this page shortly.
+          </p>
         </div>
       </section>
 
-      {/* Search & Filter + Grid */}
-      <section className="relative py-24 bg-black overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-px bg-orange-400/50" />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          {/* Search */}
-          <div className="mb-8 max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="w-5 h-5 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+      {/* Filters */}
+      <section className="sheet">
+        <div className="border-t border-ink pt-5">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="sm:col-span-2">
+              <label htmlFor="nl-search" className="lbl">
+                Search titles and topics
+              </label>
               <input
-                type="text"
+                id="nl-search"
+                type="search"
                 value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                placeholder="Search newsletters by title or topic..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-orange-400/50 focus:ring-1 focus:ring-orange-400/30 transition-colors text-sm"
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="e.g. inflation"
+                className="field mt-1"
+              />
+            </div>
+            <div>
+              <label htmlFor="nl-start" className="lbl">
+                Published after
+              </label>
+              <input
+                id="nl-start"
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="field mt-1"
+              />
+            </div>
+            <div>
+              <label htmlFor="nl-end" className="lbl">
+                Published before
+              </label>
+              <input
+                id="nl-end"
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="field mt-1"
               />
             </div>
           </div>
 
-          {/* Category Filters */}
           {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center mb-6">
-              <span className="text-gray-600 text-xs font-mono uppercase tracking-wider flex items-center gap-2 self-center">
-                <Filter className="w-3.5 h-3.5" /> Filter
-              </span>
-              {categories.map((category) => (
+            <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <span className="lbl">Topic</span>
+              {categories.map((cat) => (
                 <button
-                  key={category}
-                  onClick={() => toggleCategory(category)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-colors duration-200 ${
-                    selectedCategories.includes(category)
-                      ? 'bg-orange-400/20 text-orange-400 border border-orange-400/40'
-                      : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20 hover:text-white'
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  aria-pressed={selectedCategories.includes(cat)}
+                  className={`lbl border-b-2 py-1 transition-colors duration-150 hover:text-ink ${
+                    selectedCategories.includes(cat) ? 'border-stamp text-ink' : 'border-transparent'
                   }`}
                 >
-                  {category}
+                  {cat}
                 </button>
               ))}
-            </div>
-          )}
-
-          {/* Date Filters */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 max-w-3xl mx-auto mb-10">
-            <div className="flex flex-col md:flex-row md:items-end gap-4">
-              <div className="flex-1">
-                <label htmlFor="start-date" className="block text-xs text-gray-400 mb-2 font-mono uppercase tracking-wider">
-                  Start date
-                </label>
-                <div className="relative">
-                  <Calendar className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="start-date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => { setStartDate(e.target.value); setCurrentPage(1); }}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-3 py-3 text-gray-200 focus:outline-none focus:border-orange-400/50 text-sm"
-                  />
-                </div>
-              </div>
-              <div className="flex-1">
-                <label htmlFor="end-date" className="block text-xs text-gray-400 mb-2 font-mono uppercase tracking-wider">
-                  End date
-                </label>
-                <div className="relative">
-                  <Calendar className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    id="end-date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => { setEndDate(e.target.value); setCurrentPage(1); }}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-3 py-3 text-gray-200 focus:outline-none focus:border-orange-400/50 text-sm"
-                  />
-                </div>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="inline-flex items-center bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 hover:border-white/20 px-5 py-3 rounded-lg transition-colors duration-200 text-sm font-mono uppercase tracking-wider"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Clear
+              {filtersActive && (
+                <button type="button" onClick={clearFilters} className="lbl ml-auto text-stamp">
+                  Clear filters
                 </button>
-              </div>
-            </div>
-          </div>
-
-          {(searchQuery || selectedCategories.length > 0 || startDate || endDate) && (
-            <p className="text-center text-gray-500 text-xs font-mono mb-8 uppercase tracking-wider">
-              Showing {filteredNewsletters.length} of {newsletters.length} newsletters
-            </p>
-          )}
-
-          {/* Grid */}
-          {loading ? (
-            <div className="text-center py-24">
-              <div className="animate-spin w-10 h-10 border-2 border-orange-400 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-gray-500 text-sm font-mono uppercase tracking-wider">Loading...</p>
-            </div>
-          ) : filteredNewsletters.length === 0 ? (
-            <div className="text-center py-24">
-              <FolderOpen className="w-14 h-14 text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-500 text-sm mb-6">No newsletters match your filters.</p>
-              <button
-                onClick={clearFilters}
-                className="px-6 py-3 bg-orange-400 hover:bg-white hover:text-black text-white rounded-xl text-sm font-bold transition-all duration-300 uppercase tracking-wider"
-              >
-                Clear Filters
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paginatedNewsletters.map((newsletter) => {
-                  const isPdf = newsletter.fileName.toLowerCase().endsWith('.pdf');
-                  return (
-                    <div
-                      key={newsletter.id}
-                      className="group bg-gray-900/20 border border-white/5 hover:border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 flex flex-col relative"
-                    >
-                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                      {/* Thumbnail */}
-                      <div className="relative h-44 bg-gradient-to-br from-orange-400/10 to-amber-500/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {newsletter.thumbnail ? (
-                          <img
-                            src={newsletter.thumbnail}
-                            alt={newsletter.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        ) : (
-                          <FileText className="w-16 h-16 text-orange-400/20" />
-                        )}
-                        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider text-orange-400 border border-orange-400/20">
-                          {newsletter.category || 'Newsletter'}
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6 flex flex-col flex-grow">
-                        <h3 className="text-white font-bold text-base mb-2 line-clamp-2 group-hover:text-orange-400/90 transition-colors duration-200 uppercase tracking-tight">
-                          {newsletter.title}
-                        </h3>
-
-                        <p className="text-gray-500 text-xs mb-4 line-clamp-3 flex-grow leading-relaxed font-light">
-                          {newsletter.description}
-                        </p>
-
-                        <div className="flex items-center text-gray-600 text-xs mb-5 font-mono">
-                          <Calendar className="w-3.5 h-3.5 mr-2" />
-                          {formatDate(newsletter.uploadDate)}
-                        </div>
-
-                        <div className="flex gap-3 mt-auto">
-                          {isPdf ? (
-                            <button
-                              onClick={() => setSelectedPdf(newsletter)}
-                              className="flex-1 bg-orange-400 hover:bg-white hover:text-black text-white px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
-                            >
-                              <Eye className="w-4 h-4" />
-                              Read Now
-                            </button>
-                          ) : (
-                            <a
-                              href={newsletter.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 bg-orange-400 hover:bg-white hover:text-black text-white px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
-                            >
-                              <Eye className="w-4 h-4" />
-                              Open
-                            </a>
-                          )}
-                          <a
-                            href={newsletter.fileUrl}
-                            download={newsletter.fileName}
-                            className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 hover:border-white/20 px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider"
-                          >
-                            <Download className="w-4 h-4" />
-                            Download
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-12">
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 rounded-lg text-xs font-mono uppercase tracking-wider transition-all ${
-                        currentPage === page
-                          ? 'bg-orange-400/20 text-orange-400 border border-orange-400/40'
-                          : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20 hover:text-white'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </section>
 
-      {/* PDF Viewer Modal */}
+      {/* Index */}
+      <section className="sheet pb-20 pt-8">
+        <div className="flex items-baseline justify-between border-b border-ink pb-2">
+          <h2 className="lbl text-ink">Issues</h2>
+          <p className="lbl">
+            {loading ? 'Loading' : `${filteredNewsletters.length} of ${newsletters.length}`}
+          </p>
+        </div>
+
+        {loading ? (
+          <p className="lbl py-12">Loading the archive…</p>
+        ) : filteredNewsletters.length === 0 ? (
+          <div className="py-12">
+            <p className="text-[1.0625rem]">No issues match those filters.</p>
+            <button type="button" onClick={clearFilters} className="btn-secondary mt-4">
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <>
+            <ul className="list-none p-0">
+              {paginated.map((issue, i) => (
+                <li
+                  key={issue.id}
+                  className={`grid grid-cols-1 gap-x-6 gap-y-3 border-b border-rule px-2 py-5 sm:grid-cols-[3rem_1fr_auto] sm:items-start sm:px-4 ${
+                    i % 2 === 1 ? 'bg-band' : ''
+                  }`}
+                >
+                  <span className="fig hidden text-[0.6875rem] text-steel sm:block">
+                    {String(startIndex + i + 1).padStart(2, '0')}
+                  </span>
+
+                  <div>
+                    <h3 className="text-[1.0625rem] font-bold leading-snug">{issue.title}</h3>
+                    <p className="mt-1 max-w-column text-[0.9375rem] leading-snug text-steel">
+                      {issue.description}
+                    </p>
+                    <p className="lbl mt-2">
+                      {formatDate(issue.uploadDate)}
+                      {issue.category ? ` · ${issue.category}` : ''}
+                    </p>
+                  </div>
+
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    {issue.fileName.toLowerCase().endsWith('.pdf') ? (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPdf(issue)}
+                        className="btn-secondary"
+                      >
+                        Read
+                      </button>
+                    ) : (
+                      <a
+                        href={issue.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary"
+                      >
+                        Open
+                      </a>
+                    )}
+                    <a href={issue.fileUrl} download={issue.fileName} className="btn-secondary">
+                      Download
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {totalPages > 1 && (
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="btn-secondary disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                  Newer
+                </button>
+                <span className="lbl">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="btn-secondary disabled:opacity-40"
+                >
+                  Older
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* Reader */}
       {selectedPdf && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col border border-white/10">
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <h3 className="text-white font-bold text-base uppercase tracking-tight">
-                {selectedPdf.title}
-              </h3>
-              <button
-                onClick={() => setSelectedPdf(null)}
-                className="text-gray-500 hover:text-white transition-colors duration-200 p-2 hover:bg-white/5 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 p-3 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedPdf.title}
+        >
+          <div className="flex h-full max-h-[92vh] w-full max-w-5xl flex-col border border-ink bg-sheet">
+            <div className="flex items-center justify-between gap-4 border-b border-ink px-4 py-3">
+              <h2 className="lbl text-ink">{selectedPdf.title}</h2>
+              <div className="flex items-center gap-2">
+                <a
+                  href={selectedPdf.fileUrl}
+                  download={selectedPdf.fileName}
+                  className="lbl hover:text-stamp"
+                >
+                  Download
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPdf(null)}
+                  className="inline-flex h-11 w-11 items-center justify-center hover:text-stamp"
+                >
+                  <span className="sr-only">Close reader</span>
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
             </div>
-            <div className="flex-1 p-6 overflow-hidden">
-              <iframe
-                src={selectedPdf.fileUrl}
-                className="w-full h-full rounded-xl border border-white/5"
-                title={selectedPdf.title}
-              />
-            </div>
+            <iframe src={selectedPdf.fileUrl} className="flex-1 border-0" title={selectedPdf.title} />
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

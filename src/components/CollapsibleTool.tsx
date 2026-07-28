@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 interface CollapsibleToolProps {
   title: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
@@ -11,41 +11,38 @@ interface CollapsibleToolProps {
 
 const CollapsibleTool: React.FC<CollapsibleToolProps> = ({
   title,
-  icon,
   description,
   children,
-  defaultOpen = false
+  defaultOpen = false,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="bg-gray-900/40 backdrop-blur-md rounded-3xl border border-white/10 hover:border-orange-400/30 transition-all duration-300 overflow-hidden shadow-xl">
+    <div className={`border border-ink ${isOpen ? 'bg-sheet' : 'bg-transparent'}`}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex items-center justify-between hover:bg-white/5 transition-colors text-left"
+        aria-expanded={isOpen}
+        className="flex w-full items-start justify-between gap-4 p-4 text-left transition-colors duration-150 hover:bg-band sm:p-5"
       >
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-orange-400/10 to-yellow-500/10 rounded-2xl flex items-center justify-center text-orange-400 border border-orange-400/20 group-hover:scale-110 transition-transform">
-            {icon}
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>
-            {description && (
-              <p className="text-sm text-gray-400 mt-1 font-light">{description}</p>
-            )}
-          </div>
-        </div>
-        <div className={`text-orange-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          <ChevronDown className="w-6 h-6" />
-        </div>
+        <span>
+          <span className="block font-display text-[1.0625rem] font-bold leading-tight">{title}</span>
+          {description && (
+            <span className="mt-1 block text-[0.875rem] leading-snug text-steel">{description}</span>
+          )}
+        </span>
+        <span className="mt-0.5 shrink-0 text-steel" aria-hidden="true">
+          {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+        </span>
       </button>
 
+      {/* grid-rows 0fr → 1fr animates to the content's real height, whatever it is. */}
       <div
-        className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
       >
-        <div className="px-6 pb-8 pt-2 border-t border-white/5">
-          {children}
+        <div className="overflow-hidden">
+          <div className="border-t border-rule p-4 sm:p-5">{children}</div>
         </div>
       </div>
     </div>

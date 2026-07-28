@@ -30,23 +30,20 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-gray-900 rounded-2xl p-8 border border-gray-800">
-            <div className="flex items-center justify-center w-16 h-16 bg-red-500/10 rounded-full mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 text-red-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-white text-center mb-4">
-              Something went wrong
-            </h2>
-            <p className="text-gray-400 text-center mb-6">
-              We encountered an unexpected error. Please try refreshing the page.
-            </p>
-            <button
-              onClick={this.handleReload}
-              className="w-full px-6 py-3 bg-orange-400 hover:bg-orange-500 text-black font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group"
-            >
-              <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-              Refresh Page
+        <div className="sheet flex min-h-dvh flex-col justify-center py-20">
+          <p className="lbl flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-stamp" aria-hidden="true" />
+            Page stopped
+          </p>
+          <h2 className="display-2 mt-3">This page hit an error and stopped.</h2>
+          <p className="lede mt-4">
+            Nothing you entered was sent anywhere. Reloading usually clears it; if
+            it keeps happening, tell us at meridianalgo@gmail.com.
+          </p>
+          <div className="mt-8">
+            <button onClick={this.handleReload} className="btn-primary">
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+              Reload the page
             </button>
           </div>
         </div>

@@ -1,370 +1,188 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Code2, Github, Newspaper, Calculator, Database, Server, Cpu, Globe, Layers, ShieldCheck } from 'lucide-react';
+import Ledger from '../components/Ledger';
 
-
-const OPEN_SOURCE_PROJECTS = [
+const CONTENTS = [
   {
-    id: 1,
-    title: "FinAI",
-    description: "Finance-based LLM research and development with custom models.",
-    tags: ["Python", "ML", "Finance"],
-    icon: <Code2 className="w-6 h-6 text-blue-400" />,
-    url: "https://github.com/MeridianAlgo/FinAI"
+    n: '01',
+    to: '/tools',
+    title: 'Calculators',
+    detail: '37 worksheets — budgets, debt payoff, mortgages, taxes, retirement.',
+    count: '37',
   },
   {
-    id: 2,
-    title: "Midnight.AI",
-    description: "Multi-objective trading engine with Alpaca integration.",
-    tags: ["Python", "Trading", "ML"],
-    icon: <Cpu className="w-6 h-6 text-purple-400" />,
-    url: "https://github.com/MeridianAlgo/Midnight.AI"
+    n: '02',
+    to: '/newsletters',
+    title: 'Newsletter',
+    detail: 'Smart Cents Weekly and Corporate Compass. Read or download any issue.',
+    count: '19',
   },
   {
-    id: 3,
-    title: "Learn-Quant",
-    description: "Educational utilities for beginners in Python and JavaScript.",
-    tags: ["Python", "Education"],
-    icon: <Globe className="w-6 h-6 text-green-400" />,
-    url: "https://github.com/MeridianAlgo/Learn-Quant"
+    n: '03',
+    to: '/opensource',
+    title: 'Source code',
+    detail: 'Every tool, model, and this site itself. Public, and ready to fork.',
+    count: '16',
   },
-  {
-    id: 4,
-    title: "Cryptvault",
-    description: "Crypto analysis with AI predictions and pattern recognition.",
-    tags: ["Python", "Crypto"],
-    icon: <ShieldCheck className="w-6 h-6 text-yellow-400" />,
-    url: "https://github.com/MeridianAlgo/Cryptvault"
-  },
-  {
-    id: 5,
-    title: "AraAI",
-    description: "AI platform for stock volatility forecasting.",
-    tags: ["Python", "Analysis"],
-    icon: <Database className="w-6 h-6 text-cyan-400" />,
-    url: "https://github.com/MeridianAlgo/AraAI"
-  },
-  {
-    id: 6,
-    title: "Apex-Analysis",
-    description: "Beginner-friendly stock analysis and research platform.",
-    tags: ["Python", "Tools"],
-    icon: <Layers className="w-6 h-6 text-rose-400" />,
-    url: "https://github.com/MeridianAlgo/Apex-Analysis"
-  }
 ];
 
-const FEATURES = [
+const PUBLICATIONS = [
   {
-    title: 'Open Source',
-    desc: 'Transparent, community-driven financial tools for everyone.',
+    title: 'Smart Cents Weekly',
+    thumb: '/newsletters/thumbnails/SmartCents.png',
+    detail:
+      'The weekly issue. One market idea, one habit, and the numbers behind both — written for people who have never bought a share.',
   },
   {
-    title: 'Easy to Use',
-    desc: 'Repeatable and accessible financial utilities for daily use.',
+    title: 'Corporate Compass',
+    thumb: '/newsletters/thumbnails/Corporate-Compass.png',
+    detail:
+      'A closer read of how companies actually make money: earnings, filings, and what the jargon in them means.',
   },
-  {
-    title: 'Accuracy First',
-    desc: 'Precision and reliability are at the core of every tool we deliver.',
-  }
-];
-
-const CODESTACK = [
-  { name: 'Node.js', icon: <Server className="w-8 h-8 text-green-500" /> },
-  { name: 'Python', icon: <Code2 className="w-8 h-8 text-blue-500" /> },
-  { name: 'Rust', icon: <Code2 className="w-8 h-8 text-orange-500" /> },
-  { name: 'C++', icon: <Code2 className="w-8 h-8 text-blue-600" /> },
-  { name: 'PostgreSQL', icon: <Database className="w-8 h-8 text-indigo-400" /> },
-  { name: 'SQL', icon: <Database className="w-8 h-8 text-cyan-400" /> }
 ];
 
 const Home = () => {
-  const carouselRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    document.title = 'MeridianAlgo - Home';
-
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-
-    let animationFrameId: number;
-    const getHalfWidth = () => carousel.scrollWidth / 2;
-
-    const scroll = () => {
-      const half = getHalfWidth();
-      if (carousel.scrollLeft >= half) {
-        carousel.scrollLeft = 0;
-      }
-      carousel.scrollLeft += 1;
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-
-    let isHovering = false;
-    const startScrolling = () => {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-    const stopScrolling = () => cancelAnimationFrame(animationFrameId);
-
-    const handleMouseEnter = () => { isHovering = true; stopScrolling(); };
-    const handleMouseLeave = () => { isHovering = false; startScrolling(); };
-    const handleVisibility = () => {
-      if (document.hidden || isHovering) stopScrolling();
-      else startScrolling();
-    };
-
-    carousel.addEventListener('mouseenter', handleMouseEnter);
-    carousel.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    startScrolling();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      carousel.removeEventListener('mouseenter', handleMouseEnter);
-      carousel.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
+    document.title = 'MeridianAlgo | Home';
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white selection:bg-orange-400/30">
-
-
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900 z-10">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/mountain.jpg')",
-            filter: 'brightness(0.65)',
-          }}
-        />
-        <div className="absolute inset-0 bg-black/60" />
-
-        {/* Global Background Grid - Static Matrix Style */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+    <>
+      {/* Hero: the claim on the left, the proof on the right. */}
+      <section className="sheet grid items-start gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
+        <div>
+          <h1 className="display-1">Money math, worked out in the open.</h1>
+          <p className="lede mt-6">
+            MeridianAlgo is a student-run nonprofit. We build free calculators,
+            publish a weekly newsletter, and open-source the code behind both.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/tools" className="btn-primary">
+              Open the calculators
+            </Link>
+            <Link to="/newsletters" className="btn-secondary">
+              Read the newsletter
+            </Link>
+          </div>
+          <p className="mt-8 border-t border-rule pt-4 text-[0.9375rem] text-steel">
+            Fiscally sponsored by The Hack Foundation, a 501(c)(3).
+          </p>
         </div>
 
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-          <div className="animate-fade-in-up">
-            <h1 className="text-4xl md:text-7xl font-display font-bold mb-6 text-white text-shadow-glow tracking-tight uppercase">
-              Chart Your <span className="text-orange-400">Ascent</span>
-            </h1>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-            <p className="text-lg md:text-xl text-gray-200 font-light mb-10 max-w-2xl mx-auto leading-relaxed">
-              Advancing our future with financial tools and open-source resources.
+        <div>
+          <Ledger />
+        </div>
+      </section>
+
+      {/* Contents: an index of the site, kept as ledger rows rather than cards. */}
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <h2 className="display-2">Three things, all free.</h2>
+        </div>
+
+        <ul className="mt-8 list-none border-t border-rule p-0">
+          {CONTENTS.map((item, i) => (
+            <li key={item.n} className={i % 2 === 1 ? 'bg-band' : ''}>
+              <Link
+                to={item.to}
+                className="group grid grid-cols-[2.25rem_1fr_auto] items-baseline gap-x-4 border-b border-rule px-2 py-5 transition-colors duration-150 hover:bg-ink hover:text-paper sm:grid-cols-[3rem_1fr_auto] sm:px-4"
+              >
+                <span className="fig text-[0.6875rem] text-steel group-hover:text-paper/70">
+                  {item.n}
+                </span>
+                <span>
+                  <span className="font-display text-xl font-bold">{item.title}</span>
+                  <span className="mt-1 block max-w-column text-[0.9375rem] leading-snug text-steel group-hover:text-paper/80">
+                    {item.detail}
+                  </span>
+                </span>
+                <span className="fig text-lg">{item.count}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* How it works — plain columns, no icons, no boxes. */}
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <h2 className="display-2">How this works</h2>
+          <p className="lede mt-3">
+            Three rules we hold ourselves to on every calculator and every issue.
+          </p>
+        </div>
+        <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-3">
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">Nothing to sign up for</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              The calculators run in your browser. Your figures never leave the
+              page, and there is no account to make.
             </p>
           </div>
-          <div className="animate-fade-in-up flex flex-col sm:flex-row gap-5 justify-center items-center" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
-            <Link
-              to="/tools"
-              className="px-8 py-4 bg-orange-400 hover:bg-white text-white hover:text-black rounded-xl font-bold text-base transition-all duration-300 shadow-xl active:scale-95"
-            >
-              Try Our Tools
-            </Link>
-            <Link
-              to="/opensource"
-              className="px-8 py-4 border border-orange-400/50 text-orange-400 hover:bg-orange-400 hover:text-white hover:border-orange-400 rounded-xl font-bold text-base transition-all duration-300 backdrop-blur-sm active:scale-95 shadow-lg"
-            >
-              Explore Open Source
-            </Link>
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">The assumptions are printed</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              Each worksheet shows its inputs and the rate it assumed. If a result
+              looks wrong, check the math — or read the code that ran it.
+            </p>
+          </div>
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">Students wrote it</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              We are learning this too, which is why nothing here assumes you
+              already know what a basis point is.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Content Body */}
-      <div className="w-full relative z-10">
+      {/* Publications */}
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <h2 className="display-2">Published weekly</h2>
+          <p className="lede mt-3">
+            Two letters, 19 issues so far, and the presses are running again.
+            New issues are on the way.
+          </p>
+        </div>
 
-        {/* Purpose Section with Split Line */}
-        <section id="purpose" className="relative py-32 overflow-hidden bg-black/80 backdrop-blur-sm">
-          {/* Solid Orange Divider */}
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/55"></div>
-
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            {/* The Solid Splitter Line - Top of Section Box */}
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-[calc(100%-12rem)] h-px bg-orange-400/15"></div>
-
-            <div className="absolute -top-[152px] left-1/2 -translate-x-1/2 w-px h-[217px] bg-orange-400/15"></div>
-
-            {/* Edge Vertical Lines (Frame) */}
-            <div className="absolute top-16 left-6 md:left-24 w-px h-[698px] bg-orange-400/15"></div>
-            <div className="absolute top-16 right-6 md:right-24 w-px h-[802px] bg-orange-400/15"></div>
-
-            <div className="relative text-center space-y-6 pt-24">
-              <div className="mb-16 max-w-3xl mx-auto">
-                <span className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-orange-400 font-mono mb-6 inline-block bg-black/80 px-4 py-2 rounded-full border border-orange-400/30 backdrop-blur-sm">Our Purpose</span>
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6 tracking-tight uppercase leading-tight">
-                  Building the <span className="text-orange-400">Future of Finance</span>
-                </h2>
-                <p className="text-lg text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-                  We democratize financial intelligence through transparent research and powerful open-source utilities.
-                </p>
+        <div className="mt-8 grid gap-8 sm:grid-cols-2">
+          {PUBLICATIONS.map((pub) => (
+            <article key={pub.title} className="border border-rule bg-sheet">
+              {/* Covers are printed in one ink so they sit on the sheet. */}
+              <img
+                src={pub.thumb}
+                alt=""
+                loading="lazy"
+                className="h-44 w-full border-b border-rule bg-band object-contain p-4 grayscale"
+              />
+              <div className="p-5">
+                <h3 className="text-xl font-bold">{pub.title}</h3>
+                <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">{pub.detail}</p>
               </div>
+            </article>
+          ))}
+        </div>
 
-              <div className="relative grid md:grid-cols-3 gap-6 max-w-5xl mx-auto pb-12">
-                {[
-                  { icon: <Newspaper />, title: 'Weekly Newsletter', desc: 'Market analysis and financial strategies in your inbox.', link: '/newsletters' },
-                  { icon: <Calculator />, title: 'Financial Tools', desc: 'Interactive calculators designed for real-world scenarios.', link: '/tools' },
-                  { icon: <Code2 />, title: 'Open Source', desc: 'Access our libraries and contribute to the future of finance.', link: '/opensource' }
-                ].map((box, i) => (
-                  <Link key={i} to={box.link} className="group bg-black/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 hover:border-orange-400/40 transition-all duration-300 hover:-translate-y-1 flex flex-col items-start text-left shadow-2xl z-20">
-                    <div className="p-3 bg-orange-400/10 rounded-xl mb-6 group-hover:bg-orange-400/20 transition-colors ring-1 ring-orange-400/20">
-                      {box.icon && React.cloneElement(box.icon as React.ReactElement, { className: "w-6 h-6 text-orange-400" })}
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-3 tracking-tight group-hover:text-orange-400 transition-colors">{box.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed font-light">{box.desc}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <p className="mt-6">
+          <Link to="/newsletters" className="link">
+            Browse every issue
+          </Link>
+        </p>
+      </section>
 
-        {/* Open Source Section - Full Screen Width */}
-        <section className="relative py-32 overflow-hidden bg-black/80 backdrop-blur-sm">
-          {/* Solid Orange Divider */}
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/55"></div>
-
-          {/* Architectural Lines Continuing Through */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-[calc(100%+8rem)] bg-orange-400/15 z-0"></div>
-              <div className="absolute top-0 right-6 md:right-24 w-px h-[calc(100%+8rem)] bg-orange-400/15 z-0"></div>
-            </div>
-          </div>
-
-          <div className="relative z-10 text-center space-y-6 w-full">
-            <div className="mb-12 max-w-3xl mx-auto px-6">
-              <span className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-orange-400 font-mono mb-6 inline-block bg-black/80 px-4 py-2 rounded-full border border-orange-400/30 backdrop-blur-sm">Our Code</span>
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6 tracking-tight uppercase leading-tight">
-                For the <span className="text-orange-400">Community</span>
-              </h2>
-              <p className="text-lg text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-                Transparent code powering the next generation of analysts.
-              </p>
-            </div>
-
-            <div
-              ref={carouselRef}
-              className="flex overflow-x-hidden gap-8 px-6 py-4 cursor-grab active:cursor-grabbing scroll-smooth z-20 relative w-full"
-            >
-              {[...OPEN_SOURCE_PROJECTS, ...OPEN_SOURCE_PROJECTS, ...OPEN_SOURCE_PROJECTS].map((project, index) => (
-                <div
-                  key={`${project.id}-${index}`}
-                  className={`flex-none w-[400px] bg-black/80 backdrop-blur-xl border border-white/10 hover:border-orange-400/40 p-8 rounded-[2rem] transition-all duration-500 group relative overflow-hidden flex flex-col shadow-2xl`}
-                >
-                  <div className="flex items-center space-x-5 mb-8 relative z-10">
-                    <div className="p-4 bg-gray-900 rounded-xl ring-1 ring-white/10 group-hover:ring-orange-400/40 transition-all duration-300">
-                      {project.icon}
-                    </div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-orange-400 transition-colors tracking-tight uppercase leading-none">{project.title}</h3>
-                  </div>
-                  <p className="text-gray-400 mb-8 relative z-10 leading-relaxed min-h-[80px] text-sm font-light text-left">{project.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-8 relative z-10">
-                    {project.tags.map((tag, tagIndex) => (
-                      <span key={tagIndex} className="text-[10px] font-mono uppercase tracking-wider px-3 py-1.5 bg-white/5 text-gray-300 rounded-lg border border-white/10 group-hover:border-orange-400/20 transition-colors">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-auto w-full inline-flex items-center justify-center px-6 py-3 bg-orange-400/5 hover:bg-orange-400 text-white rounded-xl font-bold transition-all duration-300 border border-orange-400/10 group-hover:border-transparent shadow-lg uppercase tracking-widest text-[10px]"
-                  >
-                    <Github className="w-4 h-4 mr-3" />
-                    Repository
-                  </a>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8">
-              <Link to="/opensource" className="px-6 py-3 rounded-xl border border-orange-400/40 text-orange-400 hover:bg-orange-400 hover:text-white transition-all duration-300 font-bold whitespace-nowrap text-xs uppercase tracking-[0.2em] shadow-lg inline-block">
-                Explore All Projects
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Why MeridianAlgo Section - Matched Typography & Continuity */}
-        <section className="py-32 bg-black/80 backdrop-blur-sm relative">
-          {/* Solid Orange Divider */}
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/55"></div>
-
-          {/* Architectural Lines Continuing Through */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-[calc(100%+8rem)] bg-orange-400/15 z-0"></div>
-              <div className="absolute top-0 right-6 md:right-24 w-px h-[calc(100%+8rem)] bg-orange-400/15 z-0"></div>
-            </div>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-            <span className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-orange-400 font-mono mb-6 inline-block bg-black/80 px-4 py-2 rounded-full border border-orange-400/30 backdrop-blur-sm">Core Values</span>
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6 tracking-tight uppercase leading-tight">
-              The <span className="text-orange-400">Standard</span>
-            </h2>
-            <p className="text-lg text-gray-400 font-light max-w-2xl mx-auto leading-relaxed mb-16">
-              Precision, transparency, and accessibility.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-              {FEATURES.map((feature, index) => (
-                <div key={index} className="bg-gray-900/20 backdrop-blur-sm rounded-[2rem] p-10 border border-white/5 transition-all duration-500 hover:border-orange-400/40 group relative overflow-hidden z-20">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <h3 className="text-xl font-bold text-white mb-6 tracking-tight group-hover:text-orange-400 transition-colors uppercase font-display leading-tight">{feature.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed font-light">{feature.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Codestack Section (Formerly Start Now) */}
-        <section className="py-32 relative bg-black/80 backdrop-blur-sm">
-          {/* Solid Orange Divider */}
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/55"></div>
-
-          {/* Architectural Lines Ending */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-full bg-orange-400/15 z-0"></div>
-              <div className="absolute top-0 right-6 md:right-24 w-px h-full bg-orange-400/15 z-0"></div>
-              {/* Bottom Cap Line */}
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-[calc(100%-12rem)] h-px bg-orange-400/15 z-0"></div>
-            </div>
-          </div>
-
-          <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-12 tracking-tight uppercase leading-tight">
-              About Our <span className="text-orange-400">Codestack</span>
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-16">
-              {CODESTACK.map((tech, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-6 bg-gray-900/50 rounded-2xl border border-white/5 hover:border-orange-400/30 transition-all hover:-translate-y-1">
-                  <div className="mb-4">{tech.icon}</div>
-                  <span className="text-gray-400 text-sm font-mono uppercase">{tech.name}</span>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-lg text-gray-400 mb-12 font-light max-w-2xl mx-auto leading-relaxed">
-              Built with cutting-edge open source technologies for performance, reliability, and scale.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
-              <Link to="/about" className="w-full sm:w-auto px-12 py-5 bg-orange-400 hover:bg-orange-500 text-white rounded-2xl font-bold text-lg transition-all shadow-xl active:scale-95 text-center uppercase tracking-wider">
-                Our Story
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
+      {/* Closing */}
+      <section className="border-t border-ink bg-band">
+        <div className="sheet flex flex-wrap items-center justify-between gap-6 py-10">
+          <p className="max-w-column font-display text-xl font-bold leading-snug sm:text-2xl">
+            Start with the one that costs you the most money to get wrong.
+          </p>
+          <Link to="/tools" className="btn-primary">
+            Open the calculators
+          </Link>
+        </div>
+      </section>
+    </>
   );
 };
 

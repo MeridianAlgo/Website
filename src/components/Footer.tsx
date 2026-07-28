@@ -1,116 +1,106 @@
-import { Mail, Linkedin, Github } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const Footer = () => {
-  return (
-    <footer className="bg-neutral-950 pt-20 pb-10 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-orange-400" />
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="max-w-7xl mx-auto px-6 h-full relative">
-          <div className="absolute top-0 left-6 md:left-24 w-px h-full bg-orange-400/10" />
-          <div className="absolute top-0 right-6 md:right-24 w-px h-full bg-orange-400/10" />
-        </div>
+const COLUMNS = [
+  {
+    head: 'Use',
+    links: [
+      { label: 'Calculators', to: '/tools' },
+      { label: 'Newsletter archive', to: '/newsletters' },
+      { label: 'Source code', to: '/opensource' },
+    ],
+  },
+  {
+    head: 'Organization',
+    links: [
+      { label: 'About us', to: '/about' },
+      { label: 'Partners', to: '/partnerships' },
+      { label: 'Contact', to: '/contact' },
+    ],
+  },
+];
+
+const EXTERNAL = [
+  { label: 'GitHub', href: 'https://github.com/MeridianAlgo' },
+  { label: 'Email', href: 'mailto:meridianalgo@gmail.com' },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/search/results/all/?fetchDeterministicClustersOnly=true&heroEntityKey=urn%3Ali%3Aorganization%3A107717373&keywords=meridianalgo&origin=RICH_QUERY_SUGGESTION&position=0&searchId=78e6a6ae-9729-449e-8747-3931ace9b150&sid=M2v&spellCorrectionEnabled=false',
+  },
+  { label: 'The Hack Foundation', href: 'https://the.hackfoundation.org/' },
+];
+
+const Footer = () => (
+  <footer className="border-t-2 border-ink bg-sheet">
+    <div className="sheet grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="lg:col-span-2">
+        <p className="font-display text-lg font-bold">MeridianAlgo</p>
+        <p className="mt-3 max-w-column text-[0.9375rem] leading-relaxed text-steel">
+          A student-run nonprofit teaching personal finance. Fiscally sponsored by
+          The Hack Foundation, a 501(c)(3). Every calculator is free to use and our
+          code is public.
+        </p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-          {/* Logo and Bio Section */}
-          <div className="flex-1 max-w-md">
-            <Link to="/" className="flex items-center space-x-4 mb-6 group">
-              <div className="w-10 h-10 rounded-2xl overflow-hidden bg-white/5 p-1 ring-1 ring-white/10">
-                <img
-                  src="/meridianalgo.png"
-                  alt="MeridianAlgo Logo"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-2xl tracking-tight">
-                  Meridian<span className="text-orange-400">Algo</span>
-                </span>
-                <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-1">v4.5.0</span>
-              </div>
-            </Link>
-
-            <p className="text-white/70 mb-8 leading-relaxed text-sm font-light">
-              Democratizing financial intelligence through transparent research and powerful open-source utilities.
-            </p>
-
-            <div className="flex space-x-3">
-              {[
-                { icon: <Mail className="w-4 h-4" />, href: "mailto:meridianalgo@gmail.com" },
-                { icon: <Github className="w-4 h-4" />, href: "https://github.com/MeridianAlgo" },
-                { icon: <Linkedin className="w-4 h-4" />, href: "https://www.linkedin.com/search/results/all/?fetchDeterministicClustersOnly=true&heroEntityKey=urn%3Ali%3Aorganization%3A107717373&keywords=meridianalgo&origin=RICH_QUERY_SUGGESTION&position=0&searchId=78e6a6ae-9729-449e-8747-3931ace9b150&sid=M2v&spellCorrectionEnabled=false" },
-              ].map((social, i) => (
-                <a
-                  key={i}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/5 border border-white/10 hover:border-white/20 p-2 rounded-lg transition-colors duration-200 text-white/60 hover:text-white"
-                >
-                  {social.icon}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Vertical Divider for Desktop */}
-          <div className="hidden lg:block w-px bg-gradient-to-b from-transparent via-white/10 to-transparent self-stretch" />
-
-          {/* Mobile Horizontal Divider */}
-          <div className="block lg:hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
-
-          {/* Links Section */}
-          <div className="flex-[2] grid grid-cols-2 sm:grid-cols-3 gap-8">
-            {/* Platform */}
-            <div>
-              <h4 className="text-white font-semibold text-xs uppercase tracking-widest mb-4 border-l-2 border-orange-400/60 pl-3">Platform</h4>
-              <ul className="space-y-2">
-                <li><Link to="/about" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">About Us</Link></li>
-                <li><Link to="/newsletters" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">Newsletters</Link></li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h4 className="text-white font-semibold text-xs uppercase tracking-widest mb-4 border-l-2 border-orange-400/60 pl-3">Resources</h4>
-              <ul className="space-y-2">
-                <li><Link to="/tools" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">Financial Tools</Link></li>
-                <li><Link to="/opensource" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">Open Source</Link></li>
-              </ul>
-            </div>
-
-            {/* Community */}
-            <div>
-              <h4 className="text-white font-semibold text-xs uppercase tracking-widest mb-4 border-l-2 border-orange-400/60 pl-3">Community</h4>
-              <ul className="space-y-2">
-                <li><Link to="/partnerships" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">Partnerships</Link></li>
-                <li><Link to="/contact" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">Contact</Link></li>
-                <li>
-                  <a href="https://the.hackfoundation.org/" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors duration-200 text-xs font-light">
-                    The Hack Foundation
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
+      {COLUMNS.map((col) => (
+        <div key={col.head}>
+          <h2 className="lbl border-b border-rule pb-2 text-ink">{col.head}</h2>
+          <ul className="mt-3 list-none space-y-2 p-0 text-[0.9375rem]">
+            {col.links.map((link) => (
+              <li key={link.to}>
+                <Link to={link.to} className="link decoration-transparent hover:decoration-stamp">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
+      ))}
+    </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-white/50 font-light">
-            &copy; {new Date().getFullYear()} MeridianAlgo. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="https://github.com/MeridianAlgo/meridianalgo.org/releases" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 hover:text-white transition-colors duration-200 uppercase tracking-widest">Changelog</a>
-            <a href="/legal/Privacy Policy for MeridianAlgo.pdf" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 hover:text-white transition-colors duration-200 uppercase tracking-widest">Privacy</a>
-            <a href="/legal/Terms of Service for MeridianAlgo.pdf" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 hover:text-white transition-colors duration-200 uppercase tracking-widest">Terms</a>
-          </div>
-        </div>
+    <div className="sheet flex flex-wrap gap-x-6 gap-y-2 border-t border-rule py-4">
+      {EXTERNAL.map((item) => (
+        <a
+          key={item.label}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-link hover:text-stamp"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+
+    <div className="sheet flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-ink py-4">
+      <p className="m-0 text-[0.9375rem] text-steel">© {new Date().getFullYear()} MeridianAlgo</p>
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <a
+          href="/legal/Privacy Policy for MeridianAlgo.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-link hover:text-stamp"
+        >
+          Privacy
+        </a>
+        <a
+          href="/legal/Terms of Service for MeridianAlgo.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-link hover:text-stamp"
+        >
+          Terms
+        </a>
+        <a
+          href="https://github.com/MeridianAlgo/meridianalgo.org/releases"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-link hover:text-stamp"
+        >
+          Changelog v5.0.0
+        </a>
       </div>
-    </footer>
-  );
-};
+    </div>
+  </footer>
+);
 
 export default Footer;

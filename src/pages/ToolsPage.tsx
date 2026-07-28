@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   DollarSign, PiggyBank, CreditCard, Home, TrendingUp,
-  Calculator, Receipt, Shield, Briefcase, ChevronDown
+  Calculator, Receipt, Shield, Briefcase
 } from 'lucide-react';
 import CollapsibleTool from '../components/CollapsibleTool';
 
@@ -11,25 +11,33 @@ function formatCurrency(n: number) {
   return n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 }
 
+function formatCents(n: number) {
+  if (!isFinite(n)) return '-';
+  return n.toLocaleString(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 const parseNumericInput = (value: string): number => {
   if (value.trim() === '') return NaN;
   const parsed = parseFloat(value);
   return Number.isFinite(parsed) ? parsed : NaN;
 };
 
+const SECTIONS = [
+  { id: 'budget-cash-flow', title: 'Budget & Cash Flow', count: 4 },
+  { id: 'saving-investing', title: 'Saving & Investing', count: 4 },
+  { id: 'debt-loans', title: 'Debt & Loans', count: 4 },
+  { id: 'income-benefits', title: 'Income & Benefits', count: 2 },
+  { id: 'advanced-planning', title: 'Advanced Planning', count: 3 },
+  { id: 'more-calculators', title: 'More Calculators', count: 5 },
+  { id: 'everyday-tools', title: 'Everyday Tools', count: 5 },
+  { id: 'investment-analysis', title: 'Investment Analysis', count: 6 },
+  { id: 'business-salary', title: 'Business & Salary', count: 4 },
+];
+
 const ToolsPage: React.FC = () => {
   useEffect(() => {
-    document.title = 'MeridianAlgo - Tools & Calculators';
+    document.title = 'MeridianAlgo | Tools';
   }, []);
-
-
-
-  const scrollToContent = () => {
-    const content = document.getElementById('tools-start');
-    if (content) {
-      content.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   // 50/30/20 Budget
   const [income, setIncome] = useState('4000');
@@ -518,50 +526,173 @@ const ToolsPage: React.FC = () => {
     return { a: calcLoan(loanRate1, loanTerm1), b: calcLoan(loanRate2, loanTerm2) };
   }, [loanAmt, loanRate1, loanTerm1, loanRate2, loanTerm2]);
 
+  // Rent Affordability
+  const [rentIncome, setRentIncome] = useState('3800');
+  const [rentDebts, setRentDebts] = useState('300');
+  const [rentPct, setRentPct] = useState('30');
+  const rentAffordCalc = useMemo(() => {
+    const income = parseNumericInput(rentIncome) || 0;
+    const debts = parseNumericInput(rentDebts) || 0;
+    const pct = (parseNumericInput(rentPct) || 0) / 100;
+    const maxRent = income * pct;
+    return { maxRent, annual: maxRent * 12, leftOver: income - maxRent - debts };
+  }, [rentIncome, rentDebts, rentPct]);
+
+  // Cost of a Habit
+  const [habitSpend, setHabitSpend] = useState('6');
+  const [habitPerWeek, setHabitPerWeek] = useState('5');
+  const [habitYears, setHabitYears] = useState('10');
+  const [habitReturn, setHabitReturn] = useState('7');
+  const habitCalc = useMemo(() => {
+    const spend = parseNumericInput(habitSpend) || 0;
+    const perWeek = parseNumericInput(habitPerWeek) || 0;
+    const years = parseNumericInput(habitYears) || 0;
+    const r = (parseNumericInput(habitReturn) || 0) / 100 / 12;
+    const monthly = (spend * perWeek * 52) / 12;
+    const n = years * 12;
+    const invested = r > 0 ? monthly * ((Math.pow(1 + r, n) - 1) / r) : monthly * n;
+    return { yearly: monthly * 12, spent: monthly * n, invested };
+  }, [habitSpend, habitPerWeek, habitYears, habitReturn]);
+
+  // Refinance Break-Even
+  const [refiOld, setRefiOld] = useState('1850');
+  const [refiNew, setRefiNew] = useState('1640');
+  const [refiCosts, setRefiCosts] = useState('4500');
+  const refiCalc = useMemo(() => {
+    const saved = (parseNumericInput(refiOld) || 0) - (parseNumericInput(refiNew) || 0);
+    const costs = parseNumericInput(refiCosts) || 0;
+    const months = saved > 0 ? Math.ceil(costs / saved) : Infinity;
+    return { saved, months, fiveYear: saved * 60 - costs };
+  }, [refiOld, refiNew, refiCosts]);
+
+  // Expense Ratio Drag
+  const [erAmount, setErAmount] = useState('25000');
+  const [erYears, setErYears] = useState('30');
+  const [erReturn, setErReturn] = useState('7');
+  const [erRatio, setErRatio] = useState('0.75');
+  const erCalc = useMemo(() => {
+    const amount = parseNumericInput(erAmount) || 0;
+    const years = parseNumericInput(erYears) || 0;
+    const ret = (parseNumericInput(erReturn) || 0) / 100;
+    const ratio = (parseNumericInput(erRatio) || 0) / 100;
+    const gross = amount * Math.pow(1 + ret, years);
+    const net = amount * Math.pow(1 + Math.max(-0.99, ret - ratio), years);
+    return { gross, net, cost: gross - net };
+  }, [erAmount, erYears, erReturn, erRatio]);
+
+  // Real Return After Inflation
+  const [realAmount, setRealAmount] = useState('10000');
+  const [realNominal, setRealNominal] = useState('7');
+  const [realInflation, setRealInflation] = useState('3');
+  const [realYears, setRealYears] = useState('20');
+  const realCalc = useMemo(() => {
+    const amount = parseNumericInput(realAmount) || 0;
+    const nominal = (parseNumericInput(realNominal) || 0) / 100;
+    const inflation = (parseNumericInput(realInflation) || 0) / 100;
+    const years = parseNumericInput(realYears) || 0;
+    const realRate = (1 + nominal) / (1 + inflation) - 1;
+    return {
+      realRate: realRate * 100,
+      onPaper: amount * Math.pow(1 + nominal, years),
+      inTodaysMoney: amount * Math.pow(1 + realRate, years),
+    };
+  }, [realAmount, realNominal, realInflation, realYears]);
+
+  // Unit Price Compare
+  const [unitPriceA, setUnitPriceA] = useState('4.99');
+  const [unitSizeA, setUnitSizeA] = useState('12');
+  const [unitPriceB, setUnitPriceB] = useState('7.49');
+  const [unitSizeB, setUnitSizeB] = useState('20');
+  const unitCalc = useMemo(() => {
+    const sizeA = parseNumericInput(unitSizeA) || 0;
+    const sizeB = parseNumericInput(unitSizeB) || 0;
+    const a = sizeA > 0 ? (parseNumericInput(unitPriceA) || 0) / sizeA : Infinity;
+    const b = sizeB > 0 ? (parseNumericInput(unitPriceB) || 0) / sizeB : Infinity;
+    const cheaper = a === b ? 'Same price' : a < b ? 'Option A' : 'Option B';
+    const gap = Math.abs(a - b) / Math.max(a, b);
+    return { a, b, cheaper, gap: isFinite(gap) ? gap * 100 : 0 };
+  }, [unitPriceA, unitSizeA, unitPriceB, unitSizeB]);
+
+  // Finance It or Save Up
+  const [buyPrice, setBuyPrice] = useState('1200');
+  const [buyAPR, setBuyAPR] = useState('19.99');
+  const [buyTerm, setBuyTerm] = useState('12');
+  const [buySave, setBuySave] = useState('150');
+  const buyCalc = useMemo(() => {
+    const price = parseNumericInput(buyPrice) || 0;
+    const r = (parseNumericInput(buyAPR) || 0) / 100 / 12;
+    const n = parseNumericInput(buyTerm) || 0;
+    const save = parseNumericInput(buySave) || 0;
+    const payment = n > 0 ? (r > 0 ? (price * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) : price / n) : 0;
+    const total = payment * n;
+    return {
+      payment,
+      interest: total - price,
+      total,
+      monthsToSave: save > 0 ? Math.ceil(price / save) : Infinity,
+    };
+  }, [buyPrice, buyAPR, buyTerm, buySave]);
+
+  // Freelance Hourly Rate
+  const [flTarget, setFlTarget] = useState('60000');
+  const [flExpenses, setFlExpenses] = useState('6000');
+  const [flTaxRate, setFlTaxRate] = useState('25');
+  const [flWeeks, setFlWeeks] = useState('46');
+  const [flHours, setFlHours] = useState('25');
+  const flCalc = useMemo(() => {
+    const target = parseNumericInput(flTarget) || 0;
+    const expenses = parseNumericInput(flExpenses) || 0;
+    const tax = Math.min(0.9, (parseNumericInput(flTaxRate) || 0) / 100);
+    const weeks = parseNumericInput(flWeeks) || 0;
+    const hours = parseNumericInput(flHours) || 0;
+    const grossNeeded = (target + expenses) / (1 - tax);
+    const billable = weeks * hours;
+    return { grossNeeded, billable, rate: billable > 0 ? grossNeeded / billable : 0 };
+  }, [flTarget, flExpenses, flTaxRate, flWeeks, flHours]);
+
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 [background-image:radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]"></div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-400/10 blur-[100px] rounded-full pointer-events-none"></div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl mb-8 border border-white/5">
-            <Calculator className="w-10 h-10 text-orange-400" />
-          </div>
-
-          <h1 className="text-4xl md:text-7xl font-display font-bold mb-6 leading-tight uppercase tracking-tight text-white">
-            Financial <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">Tools</span>
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 mx-auto mb-8"></div>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light mb-10">
-            Interactive calculators to plan, experiment, and optimize your financial future.
-          </p>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 cursor-pointer animate-bounce">
-          <button onClick={scrollToContent} className="text-gray-500 hover:text-white transition-colors">
-            <ChevronDown className="w-8 h-8" />
-          </button>
-        </div>
+    <div>
+      <section className="sheet py-14 lg:py-20">
+        <p className="lbl"></p>
+        <h1 className="display-1 mt-3 max-w-[18ch]">37 Tools.</h1>
+        <p className="display-2 mt-3 max-w-[18ch]">Nothing to sign up for.</p>
+        <p className="lede mt-6">
+          Every calculator runs in this page. Your figures stay in the browser,
+          the assumptions are printed next to the answer, and you can read the
+          code that does the arithmetic.
+        </p>
       </section>
 
-      <div id="tools-start" className="max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="space-y-24">
+      {/* Index of the sheet */}
+      <section id="tools-index" className="sheet scroll-mt-20 pb-8">
+        <h2 className="lbl border-t border-ink pt-4 text-ink">Sections</h2>
+        <ul className="mt-3 list-none columns-1 gap-x-10 p-0 sm:columns-2 lg:columns-3">
+          {SECTIONS.map((section, i) => (
+            <li key={section.id} className="break-inside-avoid">
+              <a
+                href={`#${section.id}`}
+                className="flex items-baseline gap-3 border-b border-rule py-2 hover:text-stamp"
+              >
+                <span className="fig text-[0.6875rem] text-steel">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="text-[0.9375rem]">{section.title}</span>
+                <span className="entry-fill" aria-hidden="true" />
+                <span className="fig text-[0.8125rem] text-steel">{section.count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div id="tools-start" className="sheet pb-20">
+        <div className="space-y-16">
           {/* Section: Budget & Cash Flow */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <DollarSign className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Budget & Cash Flow</h2>
+          <section id="budget-cash-flow" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Budget & Cash Flow</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 items-start">
               <CollapsibleTool
@@ -571,42 +702,42 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Income</label>
+                    <label className="lbl mb-1 block">Monthly Income</label>
                     <input type="number" value={income} onChange={e => setIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none transition-all" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 items-end gap-4">
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Needs %</label>
+                      <label className="lbl mb-1 block">Needs %</label>
                       <input type="number" value={needs} onChange={e => setNeeds(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Wants %</label>
+                      <label className="lbl mb-1 block">Wants %</label>
                       <input type="number" value={wants} onChange={e => setWants(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Savings %</label>
+                      <label className="lbl mb-1 block">Savings %</label>
                       <input type="number" value={savings} onChange={e => setSavings(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:ring-2 focus:ring-orange-400" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <p className={`text-xs text-center font-mono ${budgetCalc.balanced ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`lbl text-center ${budgetCalc.balanced ? '' : 'text-stamp'}`}>
                     {budgetCalc.balanced ? '✓ Balanced' : '✗ Must equal 100%'}
                   </p>
-                  <div className="grid grid-cols-3 gap-3 mt-4">
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Needs</p>
-                      <p className="text-white font-bold">{formatCurrency(budgetCalc.needsAmt)}</p>
+                  <div className="mt-4 grid grid-cols-3 items-end gap-3">
+                    <div className="border border-rule bg-band p-4 text-center">
+                      <p className="lbl mb-1">Needs</p>
+                      <p className="fig font-medium">{formatCurrency(budgetCalc.needsAmt)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Wants</p>
-                      <p className="text-white font-bold">{formatCurrency(budgetCalc.wantsAmt)}</p>
+                    <div className="border border-rule bg-band p-4 text-center">
+                      <p className="lbl mb-1">Wants</p>
+                      <p className="fig font-medium">{formatCurrency(budgetCalc.wantsAmt)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-4 text-center">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Savings</p>
-                      <p className="text-white font-bold">{formatCurrency(budgetCalc.savingsAmt)}</p>
+                    <div className="border border-rule bg-band p-4 text-center">
+                      <p className="lbl mb-1">Savings</p>
+                      <p className="fig font-medium">{formatCurrency(budgetCalc.savingsAmt)}</p>
                     </div>
                   </div>
                 </div>
@@ -619,40 +750,124 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Expenses</label>
+                    <label className="lbl mb-1 block">Monthly Expenses</label>
                     <input type="number" value={monthlyExpenses} onChange={e => setMonthlyExpenses(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Months of Coverage</label>
+                    <label className="lbl mb-1 block">Months of Coverage</label>
                     <input type="number" value={coverageMonths} onChange={e => setCoverageMonths(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Current Savings</label>
+                    <label className="lbl mb-1 block">Current Savings</label>
                     <input type="number" value={emergencySavings} onChange={e => setEmergencySavings(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-6 mt-4 border border-white/5">
-                    <p className="text-sm text-gray-400 uppercase tracking-wider mb-2">Target Fund</p>
-                    <p className="text-3xl font-bold text-white mb-2">{formatCurrency(emergencyCalc.target)}</p>
+                  <div className="mt-4 border border-rule bg-band p-6">
+                    <p className="lbl mb-2">Target Fund</p>
+                    <p className="fig mb-2 text-3xl font-medium">{formatCurrency(emergencyCalc.target)}</p>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-orange-400">Gap: {formatCurrency(emergencyCalc.gap)}</span>
-                      <span className="text-gray-400">{emergencyCalc.monthsCovered.toFixed(1)} months ready</span>
+                      <span className="text-stamp">Gap: {formatCurrency(emergencyCalc.gap)}</span>
+                      <span className="text-steel">{emergencyCalc.monthsCovered.toFixed(1)} months ready</span>
                     </div>
                   </div>
                 </div>
               </CollapsibleTool>
+
+              <CollapsibleTool
+                title="Rent Affordability"
+                icon={<Home className="w-5 h-5" />}
+                description="What landlords expect you to earn"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="lbl mb-1 block">Gross Monthly Income</label>
+                    <input type="number" value={rentIncome} onChange={e => setRentIncome(e.target.value)}
+                      className="field-boxed" />
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">Other Monthly Debts</label>
+                      <input type="number" value={rentDebts} onChange={e => setRentDebts(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Rent Share %</label>
+                      <input type="number" value={rentPct} onChange={e => setRentPct(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Max Rent</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(rentAffordCalc.maxRent)}</p>
+                    <p className="lbl mt-1">{formatCurrency(rentAffordCalc.annual)} a year</p>
+                  </div>
+                  <div className="border border-rule bg-band p-3 text-center">
+                    <p className="lbl mb-1">Left for everything else</p>
+                    <p className={`fig text-lg font-medium ${rentAffordCalc.leftOver >= 0 ? '' : 'text-stamp'}`}>
+                      {formatCurrency(rentAffordCalc.leftOver)}
+                    </p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool
+                title="Cost of a Habit"
+                icon={<Receipt className="w-5 h-5" />}
+                description="What a small regular spend adds up to"
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">Cost Each Time</label>
+                      <input type="number" value={habitSpend} onChange={e => setHabitSpend(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Times Per Week</label>
+                      <input type="number" value={habitPerWeek} onChange={e => setHabitPerWeek(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">Years</label>
+                      <input type="number" value={habitYears} onChange={e => setHabitYears(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">If Invested %</label>
+                      <input type="number" value={habitReturn} onChange={e => setHabitReturn(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Per Year</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(habitCalc.yearly)}</p>
+                    </div>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Total Spent</p>
+                      <p className="fig text-lg font-medium text-stamp">{formatCurrency(habitCalc.spent)}</p>
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">If invested instead</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(habitCalc.invested)}</p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
             </div>
           </section>
 
           {/* Section: Saving & Investing */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Saving & Investing</h2>
+          <section id="saving-investing" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Saving & Investing</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 items-start">
               <CollapsibleTool
@@ -662,30 +877,30 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Initial</label>
+                    <label className="lbl mb-1 block">Initial</label>
                     <input type="number" value={compoundInitial} onChange={e => setCompoundInitial(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly +</label>
+                      <label className="lbl mb-1 block">Monthly +</label>
                       <input type="number" value={compoundMonthly} onChange={e => setCompoundMonthly(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={compoundYears} onChange={e => setCompoundYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Rate %</label>
+                    <label className="lbl mb-1 block">Rate %</label>
                     <input type="number" value={compoundRate} onChange={e => setCompoundRate(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Future Value</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(compoundCalc.futureValue)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Future Value</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(compoundCalc.futureValue)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -697,30 +912,30 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Contribution</label>
+                    <label className="lbl mb-1 block">Annual Contribution</label>
                     <input type="number" value={iraContribution} onChange={e => setIraContribution(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 items-end gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Tax Rate %</label>
+                      <label className="lbl mb-1 block">Tax Rate %</label>
                       <input type="number" value={iraTaxRate} onChange={e => setIraTaxRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={iraYears} onChange={e => setIraYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Return %</label>
+                      <label className="lbl mb-1 block">Return %</label>
                       <input type="number" value={iraReturn} onChange={e => setIraReturn(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Roth Advantage</p>
-                    <p className="text-2xl font-bold text-orange-400">{formatCurrency(Math.abs(iraCalc.difference))}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Roth Advantage</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(Math.abs(iraCalc.difference))}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -728,14 +943,14 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="Rule of 72" icon={<Calculator className="w-5 h-5" />} description="How long to double your money">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Return %</label>
+                    <label className="lbl mb-1 block">Annual Return %</label>
                     <input type="number" value={ruleRate} onChange={e => setRuleRate(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-6 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Years to Double</p>
-                    <p className="text-3xl font-bold text-orange-400">{ruleCalc.years}</p>
-                    <p className="text-xs text-gray-500 mt-2">≈ {ruleCalc.months !== Infinity ? `${ruleCalc.months} months` : '—'}</p>
+                  <div className="border border-rule bg-band p-6 text-center">
+                    <p className="lbl mb-2">Years to Double</p>
+                    <p className="fig text-3xl font-medium">{ruleCalc.years}</p>
+                    <p className="lbl mt-2">≈ {ruleCalc.months !== Infinity ? `${ruleCalc.months} months` : '—'}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -747,38 +962,38 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Salary</label>
+                    <label className="lbl mb-1 block">Annual Salary</label>
                     <input type="number" value={k401Salary} onChange={e => setK401Salary(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Your Contrib %</label>
+                      <label className="lbl mb-1 block">Your Contrib %</label>
                       <input type="number" value={k401Contribution} onChange={e => setK401Contribution(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Match %</label>
+                      <label className="lbl mb-1 block">Match %</label>
                       <input type="number" value={k401Match} onChange={e => setK401Match(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={k401Years} onChange={e => setK401Years(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Return %</label>
+                      <label className="lbl mb-1 block">Return %</label>
                       <input type="number" value={k401Return} onChange={e => setK401Return(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Pot. Future Value</p>
-                    <p className="text-2xl font-bold text-blue-400">{formatCurrency(k401Calc.futureValue)}</p>
-                    <p className="text-xs text-gray-500 mt-1">based on {formatCurrency(k401Calc.annualMatch)}/yr match</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Pot. Future Value</p>
+                    <p className="fig text-2xl font-medium text-steel">{formatCurrency(k401Calc.futureValue)}</p>
+                    <p className="lbl mt-1">based on {formatCurrency(k401Calc.annualMatch)}/yr match</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -786,12 +1001,11 @@ const ToolsPage: React.FC = () => {
           </section>
 
           {/* Section: Debt & Loans */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <CreditCard className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Debt & Loans</h2>
+          <section id="debt-loans" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Debt & Loans</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
               <CollapsibleTool
@@ -800,34 +1014,34 @@ const ToolsPage: React.FC = () => {
                 description="Plan your debt freedom"
               >
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Balance</label>
+                      <label className="lbl mb-1 block">Balance</label>
                       <input type="number" value={debtBalance} onChange={e => setDebtBalance(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">APR %</label>
+                      <label className="lbl mb-1 block">APR %</label>
                       <input type="number" value={debtAPR} onChange={e => setDebtAPR(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Min Pay</label>
+                      <label className="lbl mb-1 block">Min Pay</label>
                       <input type="number" value={debtMinPay} onChange={e => setDebtMinPay(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Extra</label>
+                      <label className="lbl mb-1 block">Extra</label>
                       <input type="number" value={debtExtra} onChange={e => setDebtExtra(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time to Payoff</p>
-                    <p className="text-2xl font-bold text-white">{debtCalc.months} months</p>
-                    <p className="text-xs text-gray-500 mt-1">Total Paid: {formatCurrency(debtCalc.totalPaid)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Time to Payoff</p>
+                    <p className="fig text-2xl font-medium">{debtCalc.months} months</p>
+                    <p className="lbl mt-1">Total Paid: {formatCurrency(debtCalc.totalPaid)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -839,30 +1053,30 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Income</label>
+                    <label className="lbl mb-1 block">Annual Income</label>
                     <input type="number" value={annualIncome} onChange={e => setAnnualIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Mth Loan Debt</label>
+                      <label className="lbl mb-1 block">Mth Loan Debt</label>
                       <input type="number" value={monthlyDebt} onChange={e => setMonthlyDebt(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Down Pmt</label>
+                      <label className="lbl mb-1 block">Down Pmt</label>
                       <input type="number" value={downPayment} onChange={e => setDownPayment(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Interest Rate %</label>
+                    <label className="lbl mb-1 block">Interest Rate %</label>
                     <input type="number" value={mortgageRate} onChange={e => setMortgageRate(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Max Home Price</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(mortgageCalc.homePrice)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Max Home Price</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(mortgageCalc.homePrice)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -874,43 +1088,82 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Income</label>
+                    <label className="lbl mb-1 block">Income</label>
                     <input type="number" value={carIncome} onChange={e => setCarIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Down Pmt</label>
+                      <label className="lbl mb-1 block">Down Pmt</label>
                       <input type="number" value={carDownPayment} onChange={e => setCarDownPayment(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Loan Rate %</label>
+                      <label className="lbl mb-1 block">Loan Rate %</label>
                       <input type="number" value={carLoanRate} onChange={e => setCarLoanRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Loan Term (Months)</label>
+                    <label className="lbl mb-1 block">Loan Term (Months)</label>
                     <input type="number" value={carLoanTerm} onChange={e => setCarLoanTerm(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Max Car Price</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(carCalc.maxCarPrice)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Max Car Price</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(carCalc.maxCarPrice)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
+
+              <CollapsibleTool
+                title="Refinance Break-Even"
+                icon={<Calculator className="w-5 h-5" />}
+                description="How long until the new rate pays for itself"
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">Current Payment</label>
+                      <input type="number" value={refiOld} onChange={e => setRefiOld(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">New Payment</label>
+                      <input type="number" value={refiNew} onChange={e => setRefiNew(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="lbl mb-1 block">Closing Costs</label>
+                    <input type="number" value={refiCosts} onChange={e => setRefiCosts(e.target.value)}
+                      className="field-boxed" />
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Break-Even</p>
+                    <p className="fig text-2xl font-medium">
+                      {isFinite(refiCalc.months) ? `${refiCalc.months} months` : 'Never'}
+                    </p>
+                    <p className="lbl mt-1">{formatCurrency(refiCalc.saved)} saved each month</p>
+                  </div>
+                  <div className="border border-rule bg-band p-3 text-center">
+                    <p className="lbl mb-1">Net after 5 years</p>
+                    <p className={`fig text-lg font-medium ${refiCalc.fiveYear >= 0 ? '' : 'text-stamp'}`}>
+                      {formatCurrency(refiCalc.fiveYear)}
+                    </p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
             </div>
           </section>
 
           {/* Section: Paycheck & HSA */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Receipt className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Income & Benefits</h2>
+          <section id="income-benefits" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Income & Benefits</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 items-start">
               <CollapsibleTool
@@ -920,30 +1173,30 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Gross Pay (Monthly)</label>
+                    <label className="lbl mb-1 block">Gross Pay (Monthly)</label>
                     <input type="number" value={paycheckGross} onChange={e => setPaycheckGross(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 items-end gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Fed Tax %</label>
+                      <label className="lbl mb-1 block">Fed Tax %</label>
                       <input type="number" value={paycheckFederal} onChange={e => setPaycheckFederal(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">State %</label>
+                      <label className="lbl mb-1 block">State %</label>
                       <input type="number" value={paycheckState} onChange={e => setPaycheckState(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">401k %</label>
+                      <label className="lbl mb-1 block">401k %</label>
                       <input type="number" value={paycheck401k} onChange={e => setPaycheck401k(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Net Take-Home</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(paycheckCalc.netPay)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Net Take-Home</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(paycheckCalc.netPay)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -955,31 +1208,31 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Contribution</label>
+                    <label className="lbl mb-1 block">Annual Contribution</label>
                     <input type="number" value={hsaContribution} onChange={e => setHsaContribution(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 items-end gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Tax Rate %</label>
+                      <label className="lbl mb-1 block">Tax Rate %</label>
                       <input type="number" value={hsaTaxRate} onChange={e => setHsaTaxRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={hsaYears} onChange={e => setHsaYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wider">Return %</label>
+                      <label className="lbl mb-1 block">Return %</label>
                       <input type="number" value={hsaReturn} onChange={e => setHsaReturn(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Future HSA Value</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(hsaCalc.futureValue)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Tax Savings: {formatCurrency(hsaCalc.taxSavings)}/yr</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Future HSA Value</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(hsaCalc.futureValue)}</p>
+                    <p className="lbl mt-1">Tax Savings: {formatCurrency(hsaCalc.taxSavings)}/yr</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -990,12 +1243,11 @@ const ToolsPage: React.FC = () => {
 
 
           {/* Section: Advanced Planning */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Advanced Planning</h2>
+          <section id="advanced-planning" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Advanced Planning</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
               <CollapsibleTool
@@ -1005,31 +1257,31 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Expenses in Retirement</label>
+                    <label className="lbl mb-1 block">Annual Expenses in Retirement</label>
                     <input type="number" value={fireAnnualExpenses} onChange={e => setFireAnnualExpenses(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Current Savings</label>
+                    <label className="lbl mb-1 block">Current Savings</label>
                     <input type="number" value={fireCurrentSavings} onChange={e => setFireCurrentSavings(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Save</label>
+                      <label className="lbl mb-1 block">Monthly Save</label>
                       <input type="number" value={fireMonthlySavings} onChange={e => setFireMonthlySavings(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Return %</label>
+                      <label className="lbl mb-1 block">Return %</label>
                       <input type="number" value={fireReturnRate} onChange={e => setFireReturnRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">FIRE Number</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(fireCalc.fireNumber)}</p>
-                    <p className="text-sm text-white mt-1">{fireCalc.yearsToFire.toFixed(1)} years to goal</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">FIRE Number</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(fireCalc.fireNumber)}</p>
+                    <p className="mt-1 text-sm">{fireCalc.yearsToFire.toFixed(1)} years to goal</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1041,24 +1293,24 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Rent</label>
+                    <label className="lbl mb-1 block">Monthly Rent</label>
                     <input type="number" value={rentMonthly} onChange={e => setRentMonthly(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Home Price</label>
+                    <label className="lbl mb-1 block">Home Price</label>
                     <input type="number" value={homePrice} onChange={e => setHomePrice(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Comaprison Years</label>
+                    <label className="lbl mb-1 block">Comaprison Years</label>
                     <input type="number" value={rentVsBuyYears} onChange={e => setRentVsBuyYears(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Verdict</p>
-                    <p className="text-xl font-bold text-white">{rentVsBuyCalc.difference > 0 ? "Rent is Cheaper" : "Buy is Cheaper"}</p>
-                    <p className="text-xs text-gray-500 mt-1">Difference: {formatCurrency(Math.abs(rentVsBuyCalc.difference))}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Verdict</p>
+                    <p className="fig text-xl font-medium">{rentVsBuyCalc.difference > 0 ? "Rent is Cheaper" : "Buy is Cheaper"}</p>
+                    <p className="lbl mt-1">Difference: {formatCurrency(Math.abs(rentVsBuyCalc.difference))}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1070,26 +1322,26 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Loan Balance</label>
+                    <label className="lbl mb-1 block">Loan Balance</label>
                     <input type="number" value={studentLoanBalance} onChange={e => setStudentLoanBalance(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Rate %</label>
+                      <label className="lbl mb-1 block">Rate %</label>
                       <input type="number" value={studentLoanRate} onChange={e => setStudentLoanRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Pay</label>
+                      <label className="lbl mb-1 block">Monthly Pay</label>
                       <input type="number" value={studentLoanPayment} onChange={e => setStudentLoanPayment(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time to Payoff</p>
-                    <p className="text-2xl font-bold text-white">{studentLoanCalc.years.toFixed(1)} years</p>
-                    <p className="text-xs text-gray-500 mt-1">Total Interest: {formatCurrency(studentLoanCalc.totalInterest)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Time to Payoff</p>
+                    <p className="fig text-2xl font-medium">{studentLoanCalc.years.toFixed(1)} years</p>
+                    <p className="lbl mt-1">Total Interest: {formatCurrency(studentLoanCalc.totalInterest)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1097,12 +1349,11 @@ const ToolsPage: React.FC = () => {
           </section>
 
           {/* Section: More Calculators */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Calculator className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">More Calculators</h2>
+          <section id="more-calculators" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">More Calculators</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
               <CollapsibleTool
@@ -1112,26 +1363,26 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Balance</label>
+                    <label className="lbl mb-1 block">Balance</label>
                     <input type="number" value={ccBalance} onChange={e => setCcBalance(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">APR %</label>
+                      <label className="lbl mb-1 block">APR %</label>
                       <input type="number" value={ccAPR} onChange={e => setCcAPR(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly Pay</label>
+                      <label className="lbl mb-1 block">Monthly Pay</label>
                       <input type="number" value={ccPayment} onChange={e => setCcPayment(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time to Payoff</p>
-                    <p className="text-2xl font-bold text-white">{ccCalc.months} months</p>
-                    <p className="text-xs text-gray-500 mt-1">Total Interest: {formatCurrency(ccCalc.totalInterest)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Time to Payoff</p>
+                    <p className="fig text-2xl font-medium">{ccCalc.months} months</p>
+                    <p className="lbl mt-1">Total Interest: {formatCurrency(ccCalc.totalInterest)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1143,19 +1394,19 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Portfolio Balance</label>
+                    <label className="lbl mb-1 block">Portfolio Balance</label>
                     <input type="number" value={retirementBalance} onChange={e => setRetirementBalance(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Withdrawal Rate %</label>
+                    <label className="lbl mb-1 block">Withdrawal Rate %</label>
                     <input type="number" value={retirementWithdrawal} onChange={e => setRetirementWithdrawal(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Monthly Income</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(retirementCalc.monthlyIncome)}</p>
-                    <p className="text-xs text-gray-500 mt-1">{formatCurrency(retirementCalc.annualIncome)}/year</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Monthly Income</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(retirementCalc.monthlyIncome)}</p>
+                    <p className="lbl mt-1">{formatCurrency(retirementCalc.annualIncome)}/year</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1167,57 +1418,57 @@ const ToolsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Taxable Income</label>
+                    <label className="lbl mb-1 block">Taxable Income</label>
                     <input type="number" value={taxIncome} onChange={e => setTaxIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Standard Deduction</label>
+                    <label className="lbl mb-1 block">Standard Deduction</label>
                     <input type="number" value={taxDeductions} onChange={e => setTaxDeductions(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Est. Tax</p>
-                    <p className="text-2xl font-bold text-white">{formatCurrency(taxCalc.tax)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Effective Rate: {taxCalc.effectiveRate.toFixed(1)}%</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Est. Tax</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(taxCalc.tax)}</p>
+                    <p className="lbl mt-1">Effective Rate: {taxCalc.effectiveRate.toFixed(1)}%</p>
                   </div>
                 </div>
               </CollapsibleTool>
 
               <CollapsibleTool title="Capital Gains Tax" icon={<Receipt className="w-5 h-5" />} description="Short-term vs long-term tax owed">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Buy Price</label>
+                      <label className="lbl mb-1 block">Buy Price</label>
                       <input type="number" value={cgBuy} onChange={e => setCgBuy(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Sell Price</label>
+                      <label className="lbl mb-1 block">Sell Price</label>
                       <input type="number" value={cgSell} onChange={e => setCgSell(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Income</label>
+                    <label className="lbl mb-1 block">Annual Income</label>
                     <input type="number" value={cgIncome} onChange={e => setCgIncome(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Gain</p>
-                    <p className="text-lg font-bold text-white">{formatCurrency(cgCalc.gain)}</p>
+                  <div className="border border-rule bg-band p-3 text-center">
+                    <p className="lbl mb-1">Gain</p>
+                    <p className="fig text-lg font-medium">{formatCurrency(cgCalc.gain)}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Short-term ({cgCalc.stRate.toFixed(0)}%)</p>
-                      <p className="text-base font-bold text-red-400">{formatCurrency(cgCalc.stTax)}</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Short-term ({cgCalc.stRate.toFixed(0)}%)</p>
+                      <p className="fig text-base font-medium text-stamp">{formatCurrency(cgCalc.stTax)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Long-term ({cgCalc.ltRate.toFixed(0)}%)</p>
-                      <p className="text-base font-bold text-green-400">{formatCurrency(cgCalc.ltTax)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Long-term ({cgCalc.ltRate.toFixed(0)}%)</p>
+                      <p className="fig text-base font-medium">{formatCurrency(cgCalc.ltTax)}</p>
                     </div>
                   </div>
-                  <p className="text-xs text-center text-orange-400 font-mono">Save {formatCurrency(cgCalc.savings)} by holding &gt;1 year</p>
+                  <p className="lbl text-center">Save {formatCurrency(cgCalc.savings)} by holding &gt;1 year</p>
                 </div>
               </CollapsibleTool>
 
@@ -1227,105 +1478,104 @@ const ToolsPage: React.FC = () => {
                 description="Plan for education costs"
               >
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Est. Cost</label>
+                      <label className="lbl mb-1 block">Est. Cost</label>
                       <input type="number" value={collegeCost} onChange={e => setCollegeCost(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={collegeYears} onChange={e => setCollegeYears(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Current</label>
+                      <label className="lbl mb-1 block">Current</label>
                       <input type="number" value={collegeSavings} onChange={e => setCollegeSavings(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly +</label>
+                      <label className="lbl mb-1 block">Monthly +</label>
                       <input type="number" value={collegeMonthly} onChange={e => setCollegeMonthly(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Return %</label>
+                    <label className="lbl mb-1 block">Return %</label>
                     <input type="number" value={collegeReturn} onChange={e => setCollegeReturn(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Projected Value</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(collegeCalc.future)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Gap: {formatCurrency(collegeCalc.gap)}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Projected Value</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(collegeCalc.future)}</p>
+                    <p className="lbl mt-1">Gap: {formatCurrency(collegeCalc.gap)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
             </div>
           </section>
           {/* Section: Everyday Tools */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Calculator className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Everyday Tools</h2>
+          <section id="everyday-tools" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Everyday Tools</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
 
               <CollapsibleTool title="Net Worth Calculator" icon={<DollarSign className="w-5 h-5" />} description="Assets minus liabilities">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Total Assets</label>
+                    <label className="lbl mb-1 block">Total Assets</label>
                     <input type="number" value={totalAssets} onChange={e => setTotalAssets(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Total Liabilities</label>
+                    <label className="lbl mb-1 block">Total Liabilities</label>
                     <input type="number" value={totalLiabilities} onChange={e => setTotalLiabilities(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                      className="field-boxed" />
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Net Worth</p>
-                    <p className={`text-2xl font-bold ${(parseFloat(totalAssets) || 0) - (parseFloat(totalLiabilities) || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Net Worth</p>
+                    <p className={`fig text-2xl font-medium ${(parseFloat(totalAssets) || 0) - (parseFloat(totalLiabilities) || 0) >= 0 ? '' : 'text-stamp'}`}>
                       {formatCurrency(netWorthCalc.netWorth)}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Asset/Debt Ratio: {netWorthCalc.ratio}</p>
+                    <p className="lbl mt-1">Asset/Debt Ratio: {netWorthCalc.ratio}</p>
                   </div>
                 </div>
               </CollapsibleTool>
 
               <CollapsibleTool title="Savings Goal" icon={<PiggyBank className="w-5 h-5" />} description="How long to reach your target">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Target</label>
+                      <label className="lbl mb-1 block">Target</label>
                       <input type="number" value={goalTarget} onChange={e => setGoalTarget(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Current</label>
+                      <label className="lbl mb-1 block">Current</label>
                       <input type="number" value={goalCurrent} onChange={e => setGoalCurrent(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly +</label>
+                      <label className="lbl mb-1 block">Monthly +</label>
                       <input type="number" value={goalMonthly} onChange={e => setGoalMonthly(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Rate %</label>
+                      <label className="lbl mb-1 block">Rate %</label>
                       <input type="number" value={goalRate} onChange={e => setGoalRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Time to Goal</p>
-                    <p className="text-2xl font-bold text-green-400">{goalCalc.years} years</p>
-                    <p className="text-xs text-gray-500 mt-1">{goalCalc.months} months total</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Time to Goal</p>
+                    <p className="fig text-2xl font-medium">{goalCalc.years} years</p>
+                    <p className="lbl mt-1">{goalCalc.months} months total</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1333,31 +1583,128 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="Tip & Bill Split" icon={<Receipt className="w-5 h-5" />} description="Split bills between people">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Bill Total</label>
+                    <label className="lbl mb-1 block">Bill Total</label>
                     <input type="number" value={tipBill} onChange={e => setTipBill(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Tip %</label>
+                      <label className="lbl mb-1 block">Tip %</label>
                       <input type="number" value={tipPct} onChange={e => setTipPct(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">People</label>
+                      <label className="lbl mb-1 block">People</label>
                       <input type="number" value={tipPeople} onChange={e => setTipPeople(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Per Person</p>
-                      <p className="text-lg font-bold text-white">{formatCurrency(tipCalc.perPerson)}</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Per Person</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(tipCalc.perPerson)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Tip Total</p>
-                      <p className="text-lg font-bold text-orange-400">{formatCurrency(tipCalc.tip)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Tip Total</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(tipCalc.tip)}</p>
                     </div>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+
+              <CollapsibleTool
+                title="Unit Price Compare"
+                icon={<Receipt className="w-5 h-5" />}
+                description="Which size is actually cheaper"
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">A: Price</label>
+                      <input type="number" step="0.01" value={unitPriceA} onChange={e => setUnitPriceA(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">A: Units</label>
+                      <input type="number" value={unitSizeA} onChange={e => setUnitSizeA(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">B: Price</label>
+                      <input type="number" step="0.01" value={unitPriceB} onChange={e => setUnitPriceB(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">B: Units</label>
+                      <input type="number" value={unitSizeB} onChange={e => setUnitSizeB(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">A Per Unit</p>
+                      <p className="fig text-lg font-medium">{formatCents(unitCalc.a)}</p>
+                    </div>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">B Per Unit</p>
+                      <p className="fig text-lg font-medium">{formatCents(unitCalc.b)}</p>
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Better buy</p>
+                    <p className="fig text-2xl font-medium">{unitCalc.cheaper}</p>
+                    <p className="lbl mt-1">{unitCalc.gap.toFixed(1)}% cheaper per unit</p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool
+                title="Finance It or Save Up"
+                icon={<CreditCard className="w-5 h-5" />}
+                description="What paying over time really costs"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="lbl mb-1 block">Price</label>
+                    <input type="number" value={buyPrice} onChange={e => setBuyPrice(e.target.value)}
+                      className="field-boxed" />
+                  </div>
+                  <div className="grid grid-cols-3 items-end gap-3">
+                    <div>
+                      <label className="lbl mb-1 block">APR %</label>
+                      <input type="number" value={buyAPR} onChange={e => setBuyAPR(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Months</label>
+                      <input type="number" value={buyTerm} onChange={e => setBuyTerm(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Save / Mo</label>
+                      <input type="number" value={buySave} onChange={e => setBuySave(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Payment</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(buyCalc.payment)}</p>
+                    </div>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Interest</p>
+                      <p className="fig text-lg font-medium text-stamp">{formatCurrency(buyCalc.interest)}</p>
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Save up instead</p>
+                    <p className="fig text-2xl font-medium">
+                      {isFinite(buyCalc.monthsToSave) ? `${buyCalc.monthsToSave} months` : '—'}
+                    </p>
+                    <p className="lbl mt-1">and keep {formatCurrency(buyCalc.interest)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1366,41 +1713,40 @@ const ToolsPage: React.FC = () => {
           </section>
 
           {/* Section: Investment Analysis */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <TrendingUp className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Investment Analysis</h2>
+          <section id="investment-analysis" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Investment Analysis</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
 
               <CollapsibleTool title="Dividend Income" icon={<TrendingUp className="w-5 h-5" />} description="Dividend yield & DRIP growth">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Amount Invested</label>
+                    <label className="lbl mb-1 block">Amount Invested</label>
                     <input type="number" value={divInvested} onChange={e => setDivInvested(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Div Yield %</label>
+                      <label className="lbl mb-1 block">Div Yield %</label>
                       <input type="number" value={divYield} onChange={e => setDivYield(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">DRIP Years</label>
+                      <label className="lbl mb-1 block">DRIP Years</label>
                       <input type="number" value={divYears} onChange={e => setDivYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Monthly Income</p>
-                      <p className="text-lg font-bold text-green-400">{formatCurrency(divCalc.monthlyDiv)}</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Monthly Income</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(divCalc.monthlyDiv)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">DRIP Value</p>
-                      <p className="text-lg font-bold text-blue-400">{formatCurrency(divCalc.dripValue)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">DRIP Value</p>
+                      <p className="fig text-lg font-medium text-steel">{formatCurrency(divCalc.dripValue)}</p>
                     </div>
                   </div>
                 </div>
@@ -1408,34 +1754,34 @@ const ToolsPage: React.FC = () => {
 
               <CollapsibleTool title="Dollar Cost Averaging" icon={<TrendingUp className="w-5 h-5" />} description="DCA strategy projected returns">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Initial</label>
+                      <label className="lbl mb-1 block">Initial</label>
                       <input type="number" value={dcaInitial} onChange={e => setDcaInitial(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Monthly</label>
+                      <label className="lbl mb-1 block">Monthly</label>
                       <input type="number" value={dcaMonthly} onChange={e => setDcaMonthly(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={dcaYears} onChange={e => setDcaYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Return %</label>
+                      <label className="lbl mb-1 block">Return %</label>
                       <input type="number" value={dcaReturn} onChange={e => setDcaReturn(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Portfolio Value</p>
-                    <p className="text-2xl font-bold text-green-400">{formatCurrency(dcaCalc.futureValue)}</p>
-                    <p className="text-xs text-gray-500 mt-1">Gain: {formatCurrency(dcaCalc.gain)} on {formatCurrency(dcaCalc.totalContrib)} invested</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Portfolio Value</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(dcaCalc.futureValue)}</p>
+                    <p className="lbl mt-1">Gain: {formatCurrency(dcaCalc.gain)} on {formatCurrency(dcaCalc.totalContrib)} invested</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1443,28 +1789,28 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="CAGR Calculator" icon={<TrendingUp className="w-5 h-5" />} description="Compound annual growth rate">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Initial Value</label>
+                    <label className="lbl mb-1 block">Initial Value</label>
                     <input type="number" value={cagrInitial} onChange={e => setCagrInitial(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Final Value</label>
+                    <label className="lbl mb-1 block">Final Value</label>
                     <input type="number" value={cagrFinal} onChange={e => setCagrFinal(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                    <label className="lbl mb-1 block">Years</label>
                     <input type="number" value={cagrYears} onChange={e => setCagrYears(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">CAGR</p>
-                      <p className="text-lg font-bold text-green-400">{cagrCalc.cagr.toFixed(2)}%</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">CAGR</p>
+                      <p className="fig text-lg font-medium">{cagrCalc.cagr.toFixed(2)}%</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Gain</p>
-                      <p className="text-lg font-bold text-orange-400">{formatCurrency(cagrCalc.gain)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Total Gain</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(cagrCalc.gain)}</p>
                     </div>
                   </div>
                 </div>
@@ -1473,31 +1819,122 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="Inflation Calculator" icon={<Calculator className="w-5 h-5" />} description="Purchasing power over time">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Today's Amount</label>
+                    <label className="lbl mb-1 block">Today's Amount</label>
                     <input type="number" value={inflationAmount} onChange={e => setInflationAmount(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Years</label>
+                      <label className="lbl mb-1 block">Years</label>
                       <input type="number" value={inflationYears} onChange={e => setInflationYears(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Inflation %</label>
+                      <label className="lbl mb-1 block">Inflation %</label>
                       <input type="number" value={inflationRate} onChange={e => setInflationRate(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Future Need</p>
-                      <p className="text-lg font-bold text-orange-400">{formatCurrency(inflationCalc.futureNeeded)}</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Future Need</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(inflationCalc.futureNeeded)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Today's Power</p>
-                      <p className="text-lg font-bold text-red-400">{formatCurrency(inflationCalc.todayPower)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Today's Power</p>
+                      <p className="fig text-lg font-medium text-stamp">{formatCurrency(inflationCalc.todayPower)}</p>
                     </div>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+
+              <CollapsibleTool
+                title="Expense Ratio Drag"
+                icon={<Receipt className="w-5 h-5" />}
+                description="What a fund's fee costs you over time"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="lbl mb-1 block">Amount Invested</label>
+                    <input type="number" value={erAmount} onChange={e => setErAmount(e.target.value)}
+                      className="field-boxed" />
+                  </div>
+                  <div className="grid grid-cols-3 items-end gap-3">
+                    <div>
+                      <label className="lbl mb-1 block">Years</label>
+                      <input type="number" value={erYears} onChange={e => setErYears(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Return %</label>
+                      <input type="number" value={erReturn} onChange={e => setErReturn(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Fee %</label>
+                      <input type="number" step="0.01" value={erRatio} onChange={e => setErRatio(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">With No Fee</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(erCalc.gross)}</p>
+                    </div>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">After Fees</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(erCalc.net)}</p>
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Paid to the fund</p>
+                    <p className="fig text-2xl font-medium text-stamp">{formatCurrency(erCalc.cost)}</p>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+              <CollapsibleTool
+                title="Return After Inflation"
+                icon={<TrendingUp className="w-5 h-5" />}
+                description="What the gain is worth in today's money"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="lbl mb-1 block">Amount Invested</label>
+                    <input type="number" value={realAmount} onChange={e => setRealAmount(e.target.value)}
+                      className="field-boxed" />
+                  </div>
+                  <div className="grid grid-cols-3 items-end gap-3">
+                    <div>
+                      <label className="lbl mb-1 block">Return %</label>
+                      <input type="number" value={realNominal} onChange={e => setRealNominal(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Inflation %</label>
+                      <input type="number" value={realInflation} onChange={e => setRealInflation(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Years</label>
+                      <input type="number" value={realYears} onChange={e => setRealYears(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">On Paper</p>
+                      <p className="fig text-lg font-medium">{formatCurrency(realCalc.onPaper)}</p>
+                    </div>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">Real Rate</p>
+                      <p className="fig text-lg font-medium">{realCalc.realRate.toFixed(2)}%</p>
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">In today's money</p>
+                    <p className="fig text-2xl font-medium">{formatCurrency(realCalc.inTodaysMoney)}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1506,36 +1943,35 @@ const ToolsPage: React.FC = () => {
           </section>
 
           {/* Section: Business & Salary */}
-          <section>
-            <div className="flex items-center space-x-4 mb-8 justify-center">
-              <Briefcase className="w-8 h-8 text-orange-400" />
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Business & Salary</h2>
+          <section id="business-salary" className="scroll-mt-20">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink pt-4">
+              <h2 className="display-2">Business & Salary</h2>
+              <a href="#tools-index" className="lbl hover:text-stamp">Back to index</a>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent mb-12"></div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
 
               <CollapsibleTool title="Salary Converter" icon={<DollarSign className="w-5 h-5" />} description="Annual ↔ hourly ↔ monthly">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Annual Salary</label>
+                    <label className="lbl mb-1 block">Annual Salary</label>
                     <input type="number" value={salaryAnnual} onChange={e => setSalaryAnnual(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Hours Per Week</label>
+                    <label className="lbl mb-1 block">Hours Per Week</label>
                     <input type="number" value={salaryHours} onChange={e => setSalaryHours(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 items-end gap-2">
                     {[
                       { label: 'Monthly', val: salaryCalc.monthly },
                       { label: 'Bi-weekly', val: salaryCalc.biweekly },
                       { label: 'Weekly', val: salaryCalc.weekly },
                       { label: 'Hourly', val: salaryCalc.hourly },
                     ].map(({ label, val }) => (
-                      <div key={label} className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</p>
-                        <p className="text-sm font-bold text-white">{formatCurrency(val)}</p>
+                      <div key={label} className="border border-rule bg-band p-3 text-center">
+                        <p className="lbl mb-1">{label}</p>
+                        <p className="fig text-sm font-medium">{formatCurrency(val)}</p>
                       </div>
                     ))}
                   </div>
@@ -1545,26 +1981,26 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="Break-Even Analysis" icon={<TrendingUp className="w-5 h-5" />} description="When does your business profit?">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Fixed Costs</label>
+                    <label className="lbl mb-1 block">Fixed Costs</label>
                     <input type="number" value={beFixed} onChange={e => setBeFixed(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Price/Unit</label>
+                      <label className="lbl mb-1 block">Price/Unit</label>
                       <input type="number" value={bePrice} onChange={e => setBePrice(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-2 font-medium">Variable/Unit</label>
+                      <label className="lbl mb-1 block">Variable/Unit</label>
                       <input type="number" value={beVariable} onChange={e => setBeVariable(e.target.value)}
-                        className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                        className="field-boxed" />
                     </div>
                   </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Break-Even Units</p>
-                    <p className="text-2xl font-bold text-white">{isFinite(beCalc.units) ? beCalc.units.toLocaleString() : '∞'}</p>
-                    <p className="text-xs text-gray-500 mt-1">Revenue needed: {isFinite(beCalc.revenue) ? formatCurrency(beCalc.revenue) : '—'}</p>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Break-Even Units</p>
+                    <p className="fig text-2xl font-medium">{isFinite(beCalc.units) ? beCalc.units.toLocaleString() : '∞'}</p>
+                    <p className="lbl mt-1">Revenue needed: {isFinite(beCalc.revenue) ? formatCurrency(beCalc.revenue) : '—'}</p>
                   </div>
                 </div>
               </CollapsibleTool>
@@ -1572,33 +2008,81 @@ const ToolsPage: React.FC = () => {
               <CollapsibleTool title="Loan Comparison" icon={<CreditCard className="w-5 h-5" />} description="Compare two loan options side by side">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-2 font-medium">Loan Amount</label>
+                    <label className="lbl mb-1 block">Loan Amount</label>
                     <input type="number" value={loanAmt} onChange={e => setLoanAmt(e.target.value)}
-                      className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white" />
+                      className="field-boxed" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <div>
-                      <p className="text-xs text-orange-400/80 uppercase tracking-wider mb-2 font-mono">Option A</p>
-                      <input type="number" value={loanRate1} onChange={e => setLoanRate1(e.target.value)} placeholder="Rate %" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white mb-2" />
-                      <input type="number" value={loanTerm1} onChange={e => setLoanTerm1(e.target.value)} placeholder="Months" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                      <p className="lbl mb-2">Option A</p>
+                      <input type="number" value={loanRate1} onChange={e => setLoanRate1(e.target.value)} placeholder="Rate %" className="field-boxed" />
+                      <input type="number" value={loanTerm1} onChange={e => setLoanTerm1(e.target.value)} placeholder="Months" className="field-boxed" />
                     </div>
                     <div>
-                      <p className="text-xs text-blue-400/80 uppercase tracking-wider mb-2 font-mono">Option B</p>
-                      <input type="number" value={loanRate2} onChange={e => setLoanRate2(e.target.value)} placeholder="Rate %" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white mb-2" />
-                      <input type="number" value={loanTerm2} onChange={e => setLoanTerm2(e.target.value)} placeholder="Months" className="cursor-target w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white" />
+                      <p className="lbl mb-2">Option B</p>
+                      <input type="number" value={loanRate2} onChange={e => setLoanRate2(e.target.value)} placeholder="Rate %" className="field-boxed" />
+                      <input type="number" value={loanTerm2} onChange={e => setLoanTerm2(e.target.value)} placeholder="Months" className="field-boxed" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-orange-400/80 uppercase tracking-wider mb-1">A Monthly</p>
-                      <p className="text-base font-bold text-white">{formatCurrency(loanCompCalc.a.pmt)}</p>
-                      <p className="text-[10px] text-gray-500 mt-1">Interest: {formatCurrency(loanCompCalc.a.interest)}</p>
+                  <div className="grid grid-cols-2 items-end gap-3">
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">A Monthly</p>
+                      <p className="fig text-base font-medium">{formatCurrency(loanCompCalc.a.pmt)}</p>
+                      <p className="lbl mt-1">Interest: {formatCurrency(loanCompCalc.a.interest)}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                      <p className="text-xs text-blue-400/80 uppercase tracking-wider mb-1">B Monthly</p>
-                      <p className="text-base font-bold text-white">{formatCurrency(loanCompCalc.b.pmt)}</p>
-                      <p className="text-[10px] text-gray-500 mt-1">Interest: {formatCurrency(loanCompCalc.b.interest)}</p>
+                    <div className="border border-rule bg-band p-3 text-center">
+                      <p className="lbl mb-1">B Monthly</p>
+                      <p className="fig text-base font-medium">{formatCurrency(loanCompCalc.b.pmt)}</p>
+                      <p className="lbl mt-1">Interest: {formatCurrency(loanCompCalc.b.interest)}</p>
                     </div>
+                  </div>
+                </div>
+              </CollapsibleTool>
+
+
+              <CollapsibleTool
+                title="Freelance Hourly Rate"
+                icon={<Briefcase className="w-5 h-5" />}
+                description="What to charge to take home your target"
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 items-end gap-4">
+                    <div>
+                      <label className="lbl mb-1 block">Take-Home Target</label>
+                      <input type="number" value={flTarget} onChange={e => setFlTarget(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Yearly Expenses</label>
+                      <input type="number" value={flExpenses} onChange={e => setFlExpenses(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 items-end gap-3">
+                    <div>
+                      <label className="lbl mb-1 block">Tax %</label>
+                      <input type="number" value={flTaxRate} onChange={e => setFlTaxRate(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Weeks</label>
+                      <input type="number" value={flWeeks} onChange={e => setFlWeeks(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                    <div>
+                      <label className="lbl mb-1 block">Billable Hrs</label>
+                      <input type="number" value={flHours} onChange={e => setFlHours(e.target.value)}
+                        className="field-boxed" />
+                    </div>
+                  </div>
+                  <div className="border border-rule bg-band p-4 text-center">
+                    <p className="lbl mb-2">Charge Per Hour</p>
+                    <p className="fig text-2xl font-medium">{formatCents(flCalc.rate)}</p>
+                    <p className="lbl mt-1">{flCalc.billable.toLocaleString()} billable hours a year</p>
+                  </div>
+                  <div className="border border-rule bg-band p-3 text-center">
+                    <p className="lbl mb-1">Must invoice</p>
+                    <p className="fig text-lg font-medium">{formatCurrency(flCalc.grossNeeded)}</p>
                   </div>
                 </div>
               </CollapsibleTool>

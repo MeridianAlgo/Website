@@ -32,8 +32,8 @@ function App() {
         <SkipToContent />
         <ScrollToTop />
         <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-black">
-            <LoadingSpinner size="lg" />
+          <div className="flex min-h-dvh items-center justify-center">
+            <LoadingSpinner />
           </div>
         }>
           <Routes>

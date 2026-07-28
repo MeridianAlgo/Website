@@ -4,6 +4,45 @@ All notable changes to meridianalgo.org are documented here.
 
 ---
 
+## [v5.0.0] - 2026-07-27
+
+Ground-up redesign. The dark/orange/glass-card treatment is gone; the site is now
+a ledger sheet.
+
+### Added
+- `Ledger` component — an interactive compound-interest worksheet on the home page,
+  running the same math as the Compound Interest tool
+- Ledger-paper design tokens (`paper`, `sheet`, `band`, `rule`, `steel`, `ink`, `stamp`)
+  and a shared class vocabulary in `index.css` (`.sheet`, `.lbl`, `.fig`, `.entry`,
+  `.field`, `.btn-*`, `.display-*`)
+- Section index with per-section counts on the calculators page, and anchors for
+  all nine tool sections
+- Eight calculators: Rent Affordability, Cost of a Habit, Refinance Break-Even,
+  Expense Ratio Drag, Return After Inflation, Unit Price Compare, Finance It or
+  Save Up, Freelance Hourly Rate — 37 in total
+
+### Changed
+- Typography: Archivo (headings) + Newsreader (body) + IBM Plex Mono (figures),
+  replacing Google Sans Flex / JetBrains Mono. No uppercase headings, no gradient text
+- Every page rewritten: full-viewport hero sections, glass cards, eyebrow pills and
+  architectural line motifs replaced with ruled rows, banded tables and plain columns
+- Copy rewritten across the site in plain language
+- `CollapsibleTool` opens to its real content height instead of a `max-h` guess
+- Contact and Partnerships now both point at meridianalgo@gmail.com
+- Repository list rebuilt from the live GitHub org: 16 public repos, with
+  Interlink, UniGroth and LiteLayer added
+- Tab titles standardised on `MeridianAlgo | Page`
+- Navigation and footer links dropped the mono uppercase label styling
+
+### Fixed
+- Removed dead links to AstryxChain and LuminaChain, which no longer exist on GitHub
+
+### Removed
+- `ScrollToTopButton`, `AnimatedSection`, `assets/styles/animations.css`
+- Mountain hero image and its preload
+
+---
+
 ## [v4.5.0] - 2026-06-21
 
 ### Added

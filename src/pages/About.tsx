@@ -1,171 +1,121 @@
 import { useEffect } from 'react';
-import { BookOpen, Zap, Globe, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const RECORD = [
+  { label: 'Structure', value: 'Student-run nonprofit' },
+  { label: 'Fiscal sponsor', value: 'The Hack Foundation, 501(c)(3)' },
+  { label: 'Years running', value: '4' },
+  { label: 'Volunteers', value: '35' },
+  { label: 'Countries', value: '4' },
+  { label: 'Newsletter issues', value: '19' },
+  { label: 'Calculators', value: '37, free, no account' },
+  { label: 'Public repositories', value: '16' },
+  { label: 'Cost to use', value: 'Nothing' },
+];
 
 const About = () => {
   useEffect(() => {
-    document.title = 'MeridianAlgo - About';
+    document.title = 'MeridianAlgo | About';
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-black text-white selection:bg-orange-400/20">
-
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:50px_50px]" />
-
-        <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
-          <div className="animate-fade-in-up">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-orange-400/80 font-mono mb-8 inline-block bg-white/5 px-4 py-2 rounded-full border border-white/10">
-              Student-Led Nonprofit
-            </span>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
-            <h1 className="text-5xl md:text-8xl font-display font-bold mb-6 leading-none uppercase tracking-tight text-white mt-6">
-              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">Us</span>
-            </h1>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10">
-              Building a global community around financial literacy and open-source tools — no jargon, no gatekeeping.
-            </p>
-          </div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
-            <div className="inline-flex items-center gap-2 text-gray-400 text-sm bg-white/5 px-6 py-3 rounded-full border border-white/10">
-              <Globe className="w-4 h-4 text-orange-400/70" />
-              Operating in 4 Countries Worldwide
-            </div>
-          </div>
+    <>
+      <section className="sheet grid items-start gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
+        <div>
+          <h1 className="display-1">
+            Students teaching the money math we had to learn ourselves.
+          </h1>
+          <p className="lede mt-6">
+            Nobody sat us down and explained compound interest, or what an APR
+            really costs, or why a 401(k) match is the closest thing to free
+            money most people will see. So we started writing it down.
+          </p>
         </div>
 
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-6 h-6 text-gray-700" />
+        {/* The record: the same ruled sheet used for every figure on this site. */}
+        <figure className="m-0 border border-ink bg-sheet">
+          <figcaption className="lbl border-b border-ink px-4 py-3 text-ink sm:px-6">
+            The organization, on record
+          </figcaption>
+          <dl className="m-0">
+            {RECORD.map((row, i) => (
+              <div key={row.label} className={i % 2 === 1 ? 'bg-band' : ''}>
+                <div className="entry px-4 sm:px-6">
+                  <dt className="text-[0.9375rem]">{row.label}</dt>
+                  <span className="entry-fill" aria-hidden="true" />
+                  <dd className="fig m-0 shrink-0 text-right text-[0.875rem]">{row.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
+        </figure>
+      </section>
+
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <p className="lbl">What we do</p>
+        </div>
+        <div className="mt-8 max-w-column space-y-5 text-[1.0625rem] leading-relaxed sm:text-[1.125rem]">
+          <p>
+            MeridianAlgo publishes a weekly newsletter, builds free calculators,
+            and releases every line of the code behind them. The audience is
+            people at the start: students, first jobs, first loans, first
+            paycheck that has to cover rent.
+          </p>
+          <p>
+            We don't sell anything and we don't take a cut of anything. There is
+            no product upsell at the end of an article, because there is no
+            product. The Hack Foundation handles our nonprofit paperwork so the
+            rest of us can spend the time writing and shipping.
+          </p>
         </div>
       </section>
 
-      {/* Content Body */}
-      <div className="relative z-10">
-
-        {/* Mission Section */}
-        <section className="relative py-32 overflow-hidden bg-black">
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/50" />
-
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-full bg-orange-400/15" />
-              <div className="absolute top-0 right-6 md:right-24 w-px h-full bg-orange-400/15" />
-            </div>
-          </div>
-
-          <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-orange-400/80 font-mono mb-6 inline-block bg-black px-4 py-2 rounded-full border border-white/10">
-              Our Mission
-            </span>
-            <h2 className="text-3xl md:text-6xl font-display font-bold text-white mb-10 tracking-tight uppercase leading-tight mt-6">
-              Finance for <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">Everyone</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-400 leading-relaxed font-light max-w-3xl mx-auto">
-              We teach finance to the next generation through practical education, open-source tools, and collaborative research. From newsletters to hands-on code — no jargon, no gatekeeping, just clarity and opportunity.
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <p className="lbl">How we work</p>
+        </div>
+        <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-3">
+          <div className="border-t border-rule pt-4">
+            <h2 className="text-lg font-bold">Plain language first</h2>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              If a sentence needs a finance degree to parse, it gets rewritten.
+              Jargon is defined the first time it appears or it doesn't appear.
             </p>
           </div>
-        </section>
-
-        {/* What Sets Us Apart */}
-        <section className="relative py-32 bg-black overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/50" />
-
-          <div className="absolute inset-0 pointer-events-none z-0">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-full bg-orange-400/15" />
-              <div className="absolute top-0 right-6 md:right-24 w-px h-full bg-orange-400/15" />
-            </div>
-          </div>
-
-          <div className="max-w-6xl mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <span className="text-[10px] uppercase tracking-[0.4em] text-orange-400/80 font-mono mb-6 inline-block bg-black px-4 py-2 rounded-full border border-white/10">
-                Core Values
-              </span>
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight uppercase leading-tight mt-6">
-                What Sets Us <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">Apart</span>
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-              {[
-                {
-                  icon: <BookOpen className="w-6 h-6 text-orange-400/80" />,
-                  title: 'Practical Education',
-                  desc: 'Financial newsletters, tutorials, and tools tailored for everyday users — not just Wall Street insiders.',
-                },
-                {
-                  icon: <Zap className="w-6 h-6 text-orange-400/80" />,
-                  title: 'Ethical Algorithms',
-                  desc: 'We champion fairness, interpretability, and responsible AI in financial education and decision-making tools.',
-                },
-                {
-                  icon: <Globe className="w-6 h-6 text-orange-400/80" />,
-                  title: 'Global Impact',
-                  desc: 'Building bridges between academia, regulators, and communities through collaborative research across 4 countries.',
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="group bg-gray-900/60 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden z-10"
-                >
-                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-4 tracking-tight uppercase group-hover:text-orange-400/90 transition-colors duration-200">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed font-light">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Vision + CTA Section */}
-        <section className="relative py-32 bg-black overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-px bg-orange-400/50" />
-
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="max-w-7xl mx-auto px-6 h-full relative">
-              <div className="absolute top-0 left-6 md:left-24 w-px h-full bg-orange-400/15" />
-              <div className="absolute top-0 right-6 md:right-24 w-px h-full bg-orange-400/15" />
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-[calc(100%-12rem)] h-px bg-orange-400/15" />
-            </div>
-          </div>
-
-          <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-orange-400/80 font-mono mb-6 inline-block bg-black px-4 py-2 rounded-full border border-white/10">
-              Our Vision
-            </span>
-            <h2 className="text-3xl md:text-6xl font-display font-bold text-white mb-8 tracking-tight uppercase leading-tight mt-6">
-              A World Without <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 pr-1">Barriers</span>
-            </h2>
-            <p className="text-lg text-gray-400 leading-relaxed font-light max-w-2xl mx-auto mb-14">
-              A world where market insights and wealth creation are accessible to everyone, regardless of background or capital.
+          <div className="border-t border-rule pt-4">
+            <h2 className="text-lg font-bold">Show the working</h2>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              Our models are interpretable on purpose. A number you can't trace
+              back to its assumptions is a number you shouldn't act on.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/tools"
-                className="px-8 py-4 bg-orange-400 hover:bg-white text-white hover:text-black rounded-xl font-bold text-base transition-all duration-300 shadow-xl active:scale-95 uppercase tracking-wider"
-              >
-                Try Our Tools
-              </Link>
-              <Link
-                to="/newsletters"
-                className="px-8 py-4 border border-orange-400/50 text-orange-400 hover:bg-orange-400 hover:text-white hover:border-orange-400 rounded-xl font-bold text-base transition-all duration-300 active:scale-95 uppercase tracking-wider"
-              >
-                Read Newsletter
-              </Link>
-            </div>
           </div>
-        </section>
+          <div className="border-t border-rule pt-4">
+            <h2 className="text-lg font-bold">Open by default</h2>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              Research, tools, and this website are public repositories. Fork
+              them, check our math, or lift a formula for your own class.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      </div>
-    </div>
+      <section className="border-t border-ink bg-band">
+        <div className="sheet flex flex-wrap items-center justify-between gap-6 py-10">
+          <p className="max-w-column font-display text-xl font-bold leading-snug sm:text-2xl">
+            Want to help write, teach, or code? We have room.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/contact" className="btn-primary">
+              Get in touch
+            </Link>
+            <Link to="/opensource" className="btn-secondary">
+              Read the source
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 

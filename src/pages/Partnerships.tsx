@@ -1,213 +1,136 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Handshake, ArrowRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import jukeboxLogo from '../assets/images/jukebox.png';
 import costcoLogo from '../assets/images/Costco.png';
 import hackFoundationLogo from '../assets/images/HackClub.png';
 
+const PARTNERS = [
+  {
+    name: 'The Hack Foundation',
+    role: 'Fiscal sponsor',
+    logo: hackFoundationLogo,
+    url: 'https://the.hackfoundation.org/',
+    detail:
+      'Holds our 501(c)(3) status and handles the nonprofit paperwork, so donations are tax-deductible and we can spend our time writing instead of filing.',
+  },
+  {
+    name: 'Jukebox Print',
+    role: 'Printing',
+    logo: jukeboxLogo,
+    url: 'https://www.jukeboxprint.com/',
+    detail:
+      'Prints the workshop handouts and stickers we hand out at events, at a rate a student nonprofit can actually pay.',
+  },
+  {
+    name: 'Costco',
+    role: 'Event food',
+    logo: costcoLogo,
+    url: 'https://www.costco.com/',
+    detail:
+      'Supplies food for our in-person sessions. Turnout goes up when there is something to eat.',
+  },
+];
+
 const Partnerships = () => {
   useEffect(() => {
-    document.title = 'MeridianAlgo - Partnerships';
+    document.title = 'MeridianAlgo | Partners';
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 [background-image:radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]"></div>
-        </div>
+    <>
+      <section className="sheet py-14 lg:py-20">
+        <p className="lbl">Partners</p>
+        <h1 className="display-1 mt-3 max-w-[20ch]">The people who cover what we can't.</h1>
+        <p className="lede mt-6">
+          We don't sell anything, so the work runs on sponsorship and donated
+          services. Here is exactly who helps and with what.
+        </p>
+      </section>
 
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl mb-8">
-              <Handshake className="w-10 h-10 text-orange-400" />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-6 leading-tight">
-              Strategic <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">Partnerships</span>
-            </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-yellow-400 mx-auto mb-8"></div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light">
-              Collaborating with industry leaders who share our vision for democratizing financial education and innovation.
+      <section className="sheet pb-4">
+        <ul className="list-none border-t border-ink p-0">
+          {PARTNERS.map((partner, i) => (
+            <li
+              key={partner.name}
+              className={`grid gap-x-8 gap-y-4 border-b border-rule px-2 py-8 sm:grid-cols-[8rem_1fr] sm:px-4 ${
+                i % 2 === 1 ? 'bg-band' : ''
+              }`}
+            >
+              <img
+                src={partner.logo}
+                alt=""
+                className="h-16 w-28 border border-rule bg-sheet object-contain p-2 grayscale"
+              />
+              <div>
+                <div className="flex flex-wrap items-baseline gap-x-4">
+                  <h2 className="text-xl font-bold">{partner.name}</h2>
+                  <span className="lbl">{partner.role}</span>
+                </div>
+                <p className="mt-2 max-w-column text-[0.9375rem] leading-relaxed text-steel">
+                  {partner.detail}
+                </p>
+                <a
+                  href={partner.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link lbl mt-3 inline-flex items-center gap-1"
+                >
+                  Visit {partner.name}
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="sheet py-14 sm:py-16">
+        <div className="border-t border-ink pt-4">
+          <p className="lbl">Working with us</p>
+          <h2 className="display-2 mt-2 max-w-[24ch]">What a partner actually gets.</h2>
+        </div>
+        <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-3">
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">A named credit</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              On this page and in the issues your support paid for. We say what
+              you gave and what it covered.
+            </p>
+          </div>
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">A student audience</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              Readers at the start of their financial lives, in four countries,
+              who asked to hear from us.
+            </p>
+          </div>
+          <div className="border-t border-rule pt-4">
+            <h3 className="text-lg font-bold">Work you can point at</h3>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-steel">
+              Free tools and open code, with a public record of where the support
+              went.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Partners Section */}
-      <section className="py-24 bg-black">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="text-xs uppercase tracking-widest text-orange-400 font-mono mb-6 inline-block bg-orange-400/10 px-4 py-2 rounded-full">Our Partners</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6 leading-tight">
-              Trusted <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">Collaborators</span>
-            </h2>
-            <div className="w-16 h-0.5 bg-gradient-to-r from-orange-400 to-yellow-400 mx-auto"></div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            {/* Hack Foundation Partner Card */}
-            <div className="group relative">
-              <div className="bg-black/40 backdrop-blur-sm border border-gray-800/50 hover:border-orange-400/30 transition-all duration-300 hover:scale-[1.02] p-8 rounded-3xl">
-                <div className="flex flex-col items-center mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl p-4 mb-6 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 border border-orange-400/30">
-                    <img
-                      src={hackFoundationLogo}
-                      alt="Hack Foundation Logo"
-                      className="h-16 w-auto object-contain"
-                    />
-                  </div>
-                  <h3 className="text-2xl font-display font-bold text-white text-center mb-2">The Hack Foundation</h3>
-                  <span className="text-orange-400 text-sm font-medium">Fiscal Sponsor</span>
-                </div>
-                <p className="text-gray-300 mb-8 text-center leading-relaxed text-sm">
-                  The Hack Foundation is our fiscal sponsor, supporting our mission to democratize financial education through their nonprofit infrastructure and resources.
-                </p>
-                <div className="flex justify-center">
-                  <a
-                    href="https://the.hackfoundation.org/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-xl font-medium transition-all duration-300 group w-48"
-                  >
-                    Visit Website
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Jukebox Print Partner Card */}
-            <div className="group relative">
-              <div className="bg-black/40 backdrop-blur-sm border border-gray-800/50 hover:border-orange-400/30 transition-all duration-300 hover:scale-[1.02] p-8 rounded-3xl">
-                <div className="flex flex-col items-center mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl p-4 mb-6 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 border border-orange-400/30">
-                    <img
-                      src={jukeboxLogo}
-                      alt="Jukebox Print Logo"
-                      className="h-16 w-auto object-contain"
-                    />
-                  </div>
-                  <h3 className="text-2xl font-display font-bold text-white text-center mb-2">Jukebox Print</h3>
-                  <span className="text-orange-400 text-sm font-medium">Printing Solutions</span>
-                </div>
-                <p className="text-gray-300 mb-8 text-center leading-relaxed text-sm">
-                  Leading provider of high-quality printing services, helping businesses and individuals bring their creative visions to life with exceptional products and outstanding customer service.
-                </p>
-                <div className="flex justify-center">
-                  <a
-                    href="https://www.jukeboxprint.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-xl font-medium transition-all duration-300 group w-48"
-                  >
-                    Visit Website
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Costco Partner Card */}
-            <div className="group relative">
-              <div className="bg-black/40 backdrop-blur-sm border border-gray-800/50 hover:border-orange-400/30 transition-all duration-300 hover:scale-[1.02] p-8 rounded-3xl">
-                <div className="flex flex-col items-center mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-orange-400/20 to-yellow-500/20 rounded-2xl p-4 mb-6 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 border border-orange-400/30">
-                    <img
-                      src={costcoLogo}
-                      alt="Costco Logo"
-                      className="h-16 w-auto object-contain"
-                    />
-                  </div>
-                  <h3 className="text-2xl font-display font-bold text-white text-center mb-2">Costco</h3>
-                  <span className="text-orange-400 text-sm font-medium">Food Services</span>
-                </div>
-                <p className="text-gray-300 mb-8 text-center leading-relaxed text-sm">
-                  Costco helps provide food for our events, ensuring we have the resources to host successful gatherings.
-                </p>
-                <div className="flex justify-center">
-                  <a
-                    href="https://www.costco.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-xl font-medium transition-all duration-300 group w-48"
-                  >
-                    Visit Website
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-24 text-center">
-            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-              Become a Partner
-            </h2>
-            <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Interested in partnering with us? We're always looking for innovative companies to collaborate with and create mutually beneficial relationships.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                to="/contact"
-                className="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-full font-medium transition-all duration-300 transform hover:scale-105 border border-white/10 hover:border-white/20 flex items-center justify-center space-x-2"
-              >
-                <span>Get in Touch</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </Link>
-              <a
-                href="mailto:partnerships@meridianalgo.com"
-                className="px-8 py-3.5 bg-transparent hover:bg-white/5 text-white rounded-full font-medium transition-all duration-300 transform hover:scale-105 border border-white/10 hover:border-white/20 flex items-center justify-center space-x-2"
-              >
-                <span>Email Us</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-24 pt-12 border-t border-gray-800/50">
-            <h3 className="text-2xl font-semibold text-center mb-8">
-              <span className="text-white">Why Partner with </span>
-              <span className="text-orange-400">Us</span>
-              <span className="text-white">?</span>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  title: 'Expand Your Reach',
-                  description: 'Connect with our growing community of traders and investors.',
-                  icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
-                },
-                {
-                  title: 'Innovate Together',
-                  description: 'Collaborate on cutting-edge financial technology solutions.',
-                  icon: 'M13 10V3L4 14h7v7l9-11h-7z'
-                },
-                {
-                  title: 'Mutual Growth',
-                  description: 'Create value for both our organizations and users through strategic partnerships.',
-                  icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
-                }
-              ].map((item, index) => (
-                <div key={index} className="bg-gray-800/30 p-6 rounded-2xl hover:bg-gray-800/50 transition-colors duration-300 border border-transparent hover:border-orange-400/30">
-                  <div className="w-12 h-12 bg-orange-400/10 rounded-xl flex items-center justify-center mb-4">
-                    <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                    </svg>
-                  </div>
-                  <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
-                  <p className="text-gray-400">{item.description}</p>
-                </div>
-              ))}
-            </div>
+      <section className="border-t border-ink bg-band">
+        <div className="sheet flex flex-wrap items-center justify-between gap-6 py-10">
+          <p className="max-w-column font-display text-xl font-bold leading-snug sm:text-2xl">
+            Want to sponsor an issue, a workshop, or a semester?
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/contact" className="btn-primary">
+              Start a conversation
+            </Link>
+            <a href="mailto:meridianalgo@gmail.com" className="btn-secondary">
+              Email us directly
+            </a>
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 };
 
